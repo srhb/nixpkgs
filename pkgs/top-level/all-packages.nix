@@ -8811,6 +8811,8 @@ in
 
   minmay = callPackage ../development/libraries/minmay { };
 
+  mir-qualia  = python3Packages.mir-qualia;
+
   miro = callPackage ../applications/video/miro {
     avahi = avahi.override {
       withLibdnssdCompat = true;

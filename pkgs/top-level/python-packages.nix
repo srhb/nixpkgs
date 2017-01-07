@@ -4330,6 +4330,26 @@ in modules // {
     };
   };
 
+  mir-qualia = buildPythonPackage rec {
+    name = "mir.qualia-${version}";
+    version = "1.0.0";
+    disabled = !isPy3k;
+
+    buildInputs = with self; [ pytest ];
+
+    src = pkgs.fetchurl {
+      url = "mirror://pypi/m/mir.qualia/mir.qualia-${version}.tar.gz";
+      sha256 = "1g0nwncwk4nq7b7zszqi1q4d2bdga1q50g9nkxigdaq647wqdf7x";
+    };
+
+    meta = {
+      description = "Dynamically enable sections of config files";
+      homepage = https://github.com/darkfeline/mir.qualia;
+      license = licenses.asl20;
+    };
+  };
+
+
   mixpanel = buildPythonPackage rec {
     version = "4.0.2";
     name = "mixpanel-${version}";
