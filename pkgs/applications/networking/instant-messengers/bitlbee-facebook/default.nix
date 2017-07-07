@@ -3,10 +3,10 @@
 with stdenv.lib;
 stdenv.mkDerivation rec {
   name = "bitlbee-facebook-${version}";
-  version = "1.1.1";
+  version = "8bbf163cfb796524754d7872e148c9793cd4452f";
 
   src = fetchFromGitHub {
-    rev = "v${version}";
+    rev = "8bbf163cfb796524754d7872e148c9793cd4452f";
     owner = "jgeboski";
     repo = "bitlbee-facebook";
     sha256 = "08ibjqqcrmq1a5nmj8z93rjrdabi0yy2a70p31xalnfrh200m24c";
