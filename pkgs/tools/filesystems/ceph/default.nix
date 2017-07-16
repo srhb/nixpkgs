@@ -21,6 +21,7 @@
 , udev
 , utillinux
 , liburcu
+, less
 }:
 
 stdenv.mkDerivation  rec {
@@ -28,6 +29,7 @@ stdenv.mkDerivation  rec {
   name = "ceph-${version}";
 
   buildInputs = [
+    less
     liburcu
     babeltrace
     boost
@@ -48,6 +50,7 @@ stdenv.mkDerivation  rec {
     pythonPackages.boost
     pythonPackages.cython
     pythonPackages.sphinx
+    stdenv
     snappy
     udev
     utillinux
@@ -60,7 +63,8 @@ stdenv.mkDerivation  rec {
 
   configurePhase = ''
     patchShebangs .
-    ./do_cmake.sh -DWITH_SYSTEM_BOOST=true
+    echo hi
+    ./do_cmake.sh -DCMAKE_INSTALL_PREFIX="$out" -DWITH_SYSTEM_BOOST=true
     substituteInPlace src/key_value_store/kv_flat_btree_async.cc --replace \
       "/usr/include/asm-generic/" \
       "${linux.dev}/lib/modules/${linux.version}/source/include/uapi/asm-generic/"
