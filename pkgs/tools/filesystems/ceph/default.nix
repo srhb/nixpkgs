@@ -21,12 +21,14 @@
 , udev
 , utillinux
 , liburcu
+, less
 }:
 
 callPackage ./generic.nix (args // rec {
   version = "9.2.0";
 
   buildInputs = [
+    less
     liburcu
     babeltrace
     boost
@@ -47,6 +49,7 @@ callPackage ./generic.nix (args // rec {
     pythonPackages.boost
     pythonPackages.cython
     pythonPackages.sphinx
+    stdenv
     snappy
     udev
     utillinux
@@ -59,7 +62,8 @@ callPackage ./generic.nix (args // rec {
 
   configurePhase = ''
     patchShebangs .
-    ./do_cmake.sh -DWITH_SYSTEM_BOOST=true
+    echo hi
+    ./do_cmake.sh -DCMAKE_INSTALL_PREFIX="$out" -DWITH_SYSTEM_BOOST=true
     substituteInPlace src/key_value_store/kv_flat_btree_async.cc --replace \
       "/usr/include/asm-generic/" \
       "${linux.dev}/lib/modules/${linux.version}/source/include/uapi/asm-generic/"
