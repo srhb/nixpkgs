@@ -1,24 +1,74 @@
-{ stdenv, fetchFromGitHub }:
+{ stdenv
+, fetchurl
+, babeltrace
+, boost
+, cmake
+, curl
+, expat
+, fuse
+, git
+, gperf
+, keyutils
+, leveldb
+, libaio
+, linux
+, lttng-ust
+, nss
+, openldap
+, python
+, pythonPackages
+, snappy
+, udev
+, utillinux
+, liburcu
+}:
 
 stdenv.mkDerivation  rec {
   version = "12.1.0";
   name = "ceph-${version}";
 
-  src = fetchFromGitHub {
-    owner = "ceph";
-    repo = "ceph";
-    rev = "v${version}";
-    fetchSubmodules = true;
-    sha256 = "0a2v3bgkrbkzardcw7ymlhhyjlwi08qmcm7g34y2sjsxk9bd78an";
+  buildInputs = [
+    liburcu
+    babeltrace
+    boost
+    cmake
+    curl
+    expat
+    fuse
+    git
+    gperf
+    keyutils
+    leveldb
+    libaio
+    linux.dev
+    lttng-ust
+    nss
+    openldap
+    python
+    pythonPackages.boost
+    pythonPackages.cython
+    pythonPackages.sphinx
+    snappy
+    udev
+    utillinux
+  ];
+
+  src = fetchurl {
+    url = "http://download.ceph.com/tarballs/ceph_${version}.orig.tar.gz";
+    sha256 = "05jrgjfjl14z488y5l33dyz7mkg099m4403n76xx9fikkjs38y5l";
   };
 
   configurePhase = ''
     patchShebangs .
     ./do_cmake.sh -DWITH_SYSTEM_BOOST=true
+    substituteInPlace src/key_value_store/kv_flat_btree_async.cc --replace \
+      "/usr/include/asm-generic/" \
+      "${linux.dev}/lib/modules/${linux.version}/source/include/uapi/asm-generic/"
   '';
 
-  preBuildPhase = ''
-    substituteInPlace src/
+  preBuild = ''
     cd build
   '';
+  
+  enableParallelBuilding = true;
 }
