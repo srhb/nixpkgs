@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, liburcu }:
+{ stdenv, fetchurl, liburcu, withPython ? true, python, pythonPackages }:
 
 # NOTE:
 #   ./configure ...
@@ -12,8 +12,8 @@
 # Debian builds with std.h (systemtap).
 
 stdenv.mkDerivation rec {
-  name = "lttng-ust-${version}";
   version = "2.9.1";
+  name = "lttng-ust-${version}";
 
   src = fetchurl {
     url = "https://lttng.org/files/lttng-ust/${name}.tar.bz2";
@@ -21,6 +21,9 @@ stdenv.mkDerivation rec {
   };
 
   buildInputs = [ liburcu ];
+  propagatedBuildInputs = [ python ];
+
+  preBuild = "patchShebangs tools";
 
   meta = with stdenv.lib; {
     description = "LTTng Userspace Tracer libraries";
