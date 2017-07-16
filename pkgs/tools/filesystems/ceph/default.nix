@@ -1,20 +1,24 @@
-{ callPackage, fetchgit, fetchpatch, ... } @ args:
+{ stdenv, fetchFromGitHub }:
 
-callPackage ./generic.nix (args // rec {
-  version = "9.2.0";
+stdenv.mkDerivation  rec {
+  version = "12.1.0";
+  name = "ceph-${version}";
 
-  src = fetchgit {
-    url = "https://github.com/ceph/ceph.git";
-    rev = "refs/tags/v${version}";
+  src = fetchFromGitHub {
+    owner = "ceph";
+    repo = "ceph";
+    rev = "v${version}";
+    fetchSubmodules = true;
     sha256 = "0a2v3bgkrbkzardcw7ymlhhyjlwi08qmcm7g34y2sjsxk9bd78an";
   };
 
-  patches = [
-    ./fix-pythonpath.patch
-    # For building with xfsprogs 4.5.0:
-    (fetchpatch {
-      url = "https://github.com/ceph/ceph/commit/602425abd5cef741fc1b5d4d1dd70c68e153fc8d.patch";
-      sha256 = "1iyf0ml2n50ki800vjich8lvzmcdviwqwkbs6cdj0vqv2nc5ii1g";
-    })
-  ];
-})
+  configurePhase = ''
+    patchShebangs .
+    ./do_cmake.sh -DWITH_SYSTEM_BOOST=true
+  '';
+
+  preBuildPhase = ''
+    substituteInPlace src/
+    cd build
+  '';
+}
