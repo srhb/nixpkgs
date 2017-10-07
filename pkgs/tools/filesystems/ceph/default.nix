@@ -26,6 +26,7 @@
 , utillinux
 , liburcu
 , less
+, makeWrapper
 }:
 
 let
@@ -60,12 +61,14 @@ stdenv'.mkDerivation rec {
     nss
     openldap
     python
+    pythonPackages.prettytable
     pythonPackages.boost
     pythonPackages.cython
     pythonPackages.sphinx
     snappy
     udev
     utillinux
+    makeWrapper
   ];
 
   configurePhase = ''
@@ -80,6 +83,11 @@ stdenv'.mkDerivation rec {
   preBuild = ''
     cd build
   '';
+
+  postBuild = ''
+    wrapProgram bin/ceph
+  '';
+
   
   enableParallelBuilding = true;
 }
