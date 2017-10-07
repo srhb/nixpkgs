@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/nix/store/flb9ar1xdd13c606aa4my9miy3iv4vyk-bash-4.4-p12/bin/sh
 
 # Usage: download kde-l10n to $dir, then run
 # $0 $dir

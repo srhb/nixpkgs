@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/nix/store/1snk2wkpv97an87pk1842fgskl1vqhkr-python-2.7.14/bin/python2
 #
 # Script to build a Nix script to actually build a Steam runtime.
 # Patched version of https://github.com/ValveSoftware/steam-runtime/blob/master/build-runtime.py

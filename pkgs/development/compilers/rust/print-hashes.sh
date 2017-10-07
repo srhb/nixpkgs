@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/nix/store/flb9ar1xdd13c606aa4my9miy3iv4vyk-bash-4.4-p12/bin/bash
 
 # All rust-related downloads can be found at
 # https://static.rust-lang.org/dist/index.html.  To find the date on

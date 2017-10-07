@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/nix/store/flb9ar1xdd13c606aa4my9miy3iv4vyk-bash-4.4-p12/bin/sh
 
 # The file from which to extract *.ico files or a particular *.ico file.
 # (e.g.: './KeePass.exe', './myLibrary.dll', './my/path/to/app.ico'). 

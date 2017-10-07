@@ -1,5 +1,7 @@
 { stdenv
 , fetchgit
+, overrideCC
+, gcc5
 , babeltrace
 , boost
 , cmake
@@ -12,6 +14,7 @@
 , leveldb
 , libaio
 , linux
+, jemalloc
 , lttng-ust
 , nss
 , glibc
@@ -25,7 +28,10 @@
 , less
 }:
 
-stdenv.mkDerivation rec {
+let
+stdenv' = overrideCC stdenv gcc5;
+in
+stdenv'.mkDerivation rec {
   version = "12.2.1";
   name = "ceph-${version}";
   
@@ -57,8 +63,7 @@ stdenv.mkDerivation rec {
     pythonPackages.boost
     pythonPackages.cython
     pythonPackages.sphinx
-    glibc
-    stdenv
+    glibc.dev
     snappy
     udev
     utillinux
