@@ -29,7 +29,7 @@
 }:
 
 let
-stdenv' = overrideCC ccacheStdenv gcc5;
+stdenv' = ccacheStdenv;
 in
 stdenv'.mkDerivation rec {
   version = "12.2.1";
@@ -63,7 +63,6 @@ stdenv'.mkDerivation rec {
     pythonPackages.boost
     pythonPackages.cython
     pythonPackages.sphinx
-    glibc.dev
     snappy
     udev
     utillinux
