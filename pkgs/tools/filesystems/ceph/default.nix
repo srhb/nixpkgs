@@ -1,4 +1,4 @@
-{ stdenv
+{ ccacheStdenv
 , fetchgit
 , overrideCC
 , gcc5
@@ -29,7 +29,7 @@
 }:
 
 let
-stdenv' = overrideCC stdenv gcc5;
+stdenv' = overrideCC ccacheStdenv gcc5;
 in
 stdenv'.mkDerivation rec {
   version = "12.2.1";
