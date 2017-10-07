@@ -1,5 +1,5 @@
 { stdenv
-, fetchurl
+, fetchgit
 , babeltrace
 , boost
 , cmake
@@ -14,6 +14,7 @@
 , linux
 , lttng-ust
 , nss
+, glibc
 , openldap
 , python
 , pythonPackages
@@ -24,8 +25,15 @@
 , less
 }:
 
-callPackage ./generic.nix (args // rec {
-  version = "9.2.0";
+stdenv.mkDerivation rec {
+  version = "12.2.1";
+  name = "ceph-${version}";
+  
+  src = fetchgit {
+    url = "https://github.com/ceph/ceph.git";
+    rev   = "v${version}";
+    sha256 = "1psavy89afi2zlj6slpzp57mvna3mn9860kgmldz02va9sxmxh09";
+  };
 
   buildInputs = [
     less
@@ -49,16 +57,12 @@ callPackage ./generic.nix (args // rec {
     pythonPackages.boost
     pythonPackages.cython
     pythonPackages.sphinx
+    glibc
     stdenv
     snappy
     udev
     utillinux
   ];
-
-  src = fetchurl {
-    url = "http://download.ceph.com/tarballs/ceph_${version}.orig.tar.gz";
-    sha256 = "05jrgjfjl14z488y5l33dyz7mkg099m4403n76xx9fikkjs38y5l";
-  };
 
   configurePhase = ''
     patchShebangs .
