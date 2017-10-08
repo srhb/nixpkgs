@@ -1,4 +1,5 @@
 { ccacheStdenv
+, stdenv
 , fetchgit
 , overrideCC
 , gcc5
@@ -31,6 +32,7 @@
 
 let
 stdenv' = ccacheStdenv;
+#stdenv' = stdenv;
 in
 stdenv'.mkDerivation rec {
   version = "12.2.1";
@@ -71,6 +73,10 @@ stdenv'.mkDerivation rec {
     makeWrapper
   ];
 
+  outputs = [ "out" "lib" ];
+  
+  installFlags = [ "sysconfdir=\${out}/etc" ];
+
   configurePhase = ''
     patchShebangs .
     echo hi
@@ -87,7 +93,6 @@ stdenv'.mkDerivation rec {
   postBuild = ''
     wrapProgram bin/ceph
   '';
-
   
   enableParallelBuilding = true;
 }
