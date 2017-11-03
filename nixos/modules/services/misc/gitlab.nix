@@ -22,7 +22,7 @@ let
       adapter: postgresql
       database: ${cfg.databaseName}
       host: ${cfg.databaseHost}
-      password: ${cfg.databasePassword}
+      password: #dbpasswordplaceholder#
       username: ${cfg.databaseUsername}
       encoding: utf8
   '';
@@ -67,10 +67,10 @@ let
 
   secretsYml = ''
     production:
-      secret_key_base: ${cfg.secrets.secret}
-      otp_key_base: ${cfg.secrets.otp}
-      db_key_base: ${cfg.secrets.db}
-      jws_private_key: ${builtins.toJSON cfg.secrets.jws}
+      secret_key_base: #secretkeyplaceholder#
+      otp_key_base: #otpkeyplaceholder#
+      db_key_base: #dbkeyplaceholder#
+      jws_private_key: #jwskeyplaceholder#
   '';
 
   gitlabConfig = {
@@ -247,8 +247,7 @@ in {
       };
 
       databasePassword = mkOption {
-        type = types.str;
-        default = "";
+        type = types.path;
         description = "Gitlab database user password.";
       };
 
@@ -370,7 +369,7 @@ in {
       };
 
       secrets.secret = mkOption {
-        type = types.str;
+        type = types.path;
         description = ''
           The secret is used to encrypt variables in the DB. If
           you change or lose this key you will be unable to access variables
@@ -382,7 +381,7 @@ in {
       };
 
       secrets.db = mkOption {
-        type = types.str;
+        type = types.path;
         description = ''
           The secret is used to encrypt variables in the DB. If
           you change or lose this key you will be unable to access variables
@@ -394,7 +393,7 @@ in {
       };
 
       secrets.otp = mkOption {
-        type = types.str;
+        type = types.path;
         description = ''
           The secret is used to encrypt secrets for OTP tokens. If
           you change or lose this key, users which have 2FA enabled for login
@@ -406,7 +405,7 @@ in {
       };
 
       secrets.jws = mkOption {
-        type = types.str;
+        type = types.path;
         description = ''
           The secret is used to encrypt session keys. If you change or lose
           this key, users will be disconnected.
@@ -439,12 +438,6 @@ in {
   config = mkIf cfg.enable {
 
     environment.systemPackages = [ pkgs.git gitlab-rake cfg.packages.gitlab-shell ];
-
-    assertions = [
-      { assertion = cfg.databasePassword != "";
-        message = "databasePassword must be set";
-      }
-    ];
 
     # Redis is required for the sidekiq queue runner.
     services.redis.enable = mkDefault true;
@@ -598,12 +591,24 @@ in {
 
         # JSON is a subset of YAML
         ln -fs ${pkgs.writeText "gitlab.yml" (builtins.toJSON gitlabConfig)} ${cfg.statePath}/config/gitlab.yml
-        ln -fs ${pkgs.writeText "database.yml" databaseYml} ${cfg.statePath}/config/database.yml
-        ln -fs ${pkgs.writeText "secrets.yml" secretsYml} ${cfg.statePath}/config/secrets.yml
+        cp -f  ${pkgs.writeText "database.yml" databaseYml} ${cfg.statePath}/config/database.yml
+        cp -f  ${pkgs.writeText "secrets.yml" secretsYml} ${cfg.statePath}/config/secrets.yml
         ln -fs ${pkgs.writeText "unicorn.rb" unicornConfig} ${cfg.statePath}/config/unicorn.rb
 
         chown -R ${cfg.user}:${cfg.group} ${cfg.statePath}/
         chmod -R ug+rwX,o-rwx+X ${cfg.statePath}/
+
+        DBPASSWORD=$(cat ${cfg.databasePassword})
+        SECRETKEY=$(cat ${cfg.secrets.secret})
+        OTPKEY=$(cat ${cfg.secrets.otp})
+        DBKEY=$(cat ${cfg.secrets.db})
+        JWSKEY=$(${pkgs.jq}/bin/jq -Rs . ${cfg.secrets.jws} | sed -e 's,\\n,\\\\n,g')
+
+        sed -e "s,#dbpasswordplaceholder#,$DBPASSWORD,g" -i ${cfg.statePath}/config/database.yml
+        sed -e "s,#secretkeyplaceholder#,$SECRETKEY,g"   -i ${cfg.statePath}/config/secrets.yml
+        sed -e "s,#otpkeyplaceholder#,$OTPKEY,g"         -i ${cfg.statePath}/config/secrets.yml
+        sed -e "s,#dbkeyplaceholder#,$DBKEY,g"           -i ${cfg.statePath}/config/secrets.yml
+        sed -e "s,#jwskeyplaceholder#,$JWSKEY,g"         -i ${cfg.statePath}/config/secrets.yml
 
         # Install the shell required to push repositories
         ln -fs ${pkgs.writeText "config.yml" gitlabShellYml} "$GITLAB_SHELL_CONFIG_PATH"
@@ -612,7 +617,7 @@ in {
 
         if [ "${cfg.databaseHost}" = "127.0.0.1" ]; then
           if ! test -e "${cfg.statePath}/db-created"; then
-            ${pkgs.sudo}/bin/sudo -u ${pgSuperUser} psql postgres -c "CREATE ROLE ${cfg.databaseUsername} WITH LOGIN NOCREATEDB NOCREATEROLE ENCRYPTED PASSWORD '${cfg.databasePassword}'"
+            ${pkgs.sudo}/bin/sudo -u ${pgSuperUser} psql postgres -c "CREATE ROLE ${cfg.databaseUsername} WITH LOGIN NOCREATEDB NOCREATEROLE ENCRYPTED PASSWORD '$DBPASSWORD'"
             ${pkgs.sudo}/bin/sudo -u ${pgSuperUser} ${config.services.postgresql.package}/bin/createdb --owner ${cfg.databaseUsername} ${cfg.databaseName}
             touch "${cfg.statePath}/db-created"
           fi
