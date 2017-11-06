@@ -9,8 +9,16 @@ import ./make-test.nix ({ pkgs, ...} : {
   nodes = {
     gitlab = { config, pkgs, ... }: {
       virtualisation.memorySize = 768;
-      services.gitlab.enable = true;
-      services.gitlab.databasePassword = "gitlab";
+
+      services.nginx = {
+        enable = true;
+        virtualHosts = {
+          "localhost" = {
+            locations."/".proxyPass = "http://unix:/run/gitlab/gitlab-workhorse.socket";
+          };
+        };
+      };
+
       systemd.services.gitlab.serviceConfig.TimeoutStartSec = "10min";
       services.gitlab = {
         enable = true;
@@ -59,6 +67,6 @@ import ./make-test.nix ({ pkgs, ...} : {
     $gitlab->start();
     $gitlab->waitForUnit("gitlab.service");
     $gitlab->waitForUnit("gitlab-sidekiq.service");
-    $gitlab->waitUntilSucceeds("curl http://localhost:8080/users/sign_in");
+    $gitlab->waitUntilSucceeds("curl http://localhost:80/users/sign_in");
   '';
 })
