@@ -561,7 +561,8 @@
   ./services/scheduling/cron.nix
   ./services/scheduling/fcron.nix
   ./services/scheduling/marathon.nix
-  ./services/search/elasticsearch.nix
+  ./services/search/elasticsearch/elasticsearch.nix
+  ./services/search/elasticsearch/elasticsearch6.nix
   ./services/search/hound.nix
   ./services/search/kibana.nix
   ./services/search/solr.nix
