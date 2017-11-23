@@ -32,7 +32,7 @@ in {
           services = {
             logstash = {
               enable = true;
-              package = pkgs.logstash5;
+              package = pkgs.logstash6;
               inputConfig = ''
                 exec { command => "echo -n flowers" interval => 1 type => "test" }
                 exec { command => "echo -n dragons" interval => 1 type => "test" }
@@ -55,12 +55,12 @@ in {
 
             elasticsearch = {
               enable = true;
-              package = pkgs.elasticsearch5;
+              package = pkgs.elasticsearch6;
             };
 
             kibana = {
               enable = true;
-              package = pkgs.kibana5;
+              package = pkgs.kibana6;
               elasticsearch.url = esUrl;
             };
           };

@@ -14,6 +14,8 @@ let
     ${if es5 then ''
       http.port: ${toString cfg.port}
       transport.tcp.port: ${toString cfg.tcp_port}
+      path.logs: ${toString cfg.dataDir}/logs
+      path.data: ${toString cfg.dataDir}
     '' else ''
       network.port: ${toString cfg.port}
       network.tcp.port: ${toString cfg.tcp_port}
@@ -165,6 +167,7 @@ in {
       path = [ pkgs.inetutils ];
       environment = {
         ES_HOME = cfg.dataDir;
+        ES_PATH_CONF = configDir;
         ES_JAVA_OPTS = toString ([ "-Des.path.conf=${configDir}" ] ++ cfg.extraJavaOptions);
       };
       serviceConfig = {
