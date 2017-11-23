@@ -61,9 +61,9 @@ in
 
       package = mkOption {
         type = types.package;
-        default = pkgs.logstash;
-        defaultText = "pkgs.logstash";
-        example = literalExample "pkgs.logstash";
+        default = pkgs.logstash6;
+        defaultText = "pkgs.logstash6";
+        example = literalExample "pkgs.logstash6";
         description = "Logstash package to use.";
       };
 
@@ -173,7 +173,11 @@ in
 
   ###### implementation
 
-  config = mkIf cfg.enable {
+  config = mkIf cfg.enable (
+  mkAssert
+  (!config.services.logstash6.enable)
+  "Multiple versions of Logstash cannot be enabled at the same time"
+  {
     assertions = [
       { assertion = atLeast54 -> !cfg.enableWeb;
         message = ''
@@ -204,5 +208,5 @@ in
         ]);
       };
     };
-  };
+  });
 }

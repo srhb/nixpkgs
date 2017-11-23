@@ -157,7 +157,11 @@ in {
 
   ###### implementation
 
-  config = mkIf cfg.enable {
+  config = mkIf cfg.enable (
+  mkAssert
+  (!config.services.elasticsearch6.enable)
+  "Multiple versions of Elasticsearch cannot be enabled at the same time."
+  {
     systemd.services.elasticsearch = {
       description = "Elasticsearch Daemon";
       wantedBy = [ "multi-user.target" ];
@@ -203,5 +207,5 @@ in {
         group = "elasticsearch";
       };
     };
-  };
+  });
 }
