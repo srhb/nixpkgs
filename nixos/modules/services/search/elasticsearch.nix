@@ -289,8 +289,7 @@ in {
       environment = {
         ES_HOME = cfg.dataDir;
         ES_JAVA_OPTS = toString ([ "-Des.path.conf=${configDir}" ] ++ cfg.extraJavaOptions);
-      } // if es6 then { ES_PATH_CONF = configDir; } else {};
-
+      } // (if es6 then { ES_PATH_CONF = configDir; } else {});
       serviceConfig = {
         ExecStart = "${cfg.package}/bin/elasticsearch ${toString cfg.extraCmdLineOptions}";
         User = "elasticsearch";
