@@ -6,16 +6,20 @@ let
   cfg = config.services.elasticsearch;
 
   es5 = builtins.compareVersions (builtins.parseDrvName cfg.package.name).version "5" >= 0;
+  es6 = builtins.compareVersions (builtins.parseDrvName cfg.package.name).version "6" >= 0;
 
   esConfig = ''
     network.host: ${cfg.listenAddress}
     cluster.name: ${cfg.cluster_name}
 
-    ${if es5 then ''
+    ${ if es6 then ''
       http.port: ${toString cfg.port}
       transport.tcp.port: ${toString cfg.tcp_port}
       path.logs: ${toString cfg.dataDir}/logs
       path.data: ${toString cfg.dataDir}
+    '' else if es5 then ''
+      http.port: ${toString cfg.port}
+      transport.tcp.port: ${toString cfg.tcp_port}
     '' else ''
       network.port: ${toString cfg.port}
       network.tcp.port: ${toString cfg.tcp_port}
@@ -30,8 +34,8 @@ let
     name = "elasticsearch-config";
     paths = [
       (pkgs.writeTextDir "elasticsearch.yml" esConfig)
-      (pkgs.writeTextDir "jvm.options" cfg.jvmOptions)
-      (if es5 then (pkgs.writeTextDir "log4j2.properties" cfg.logging)
+      (if es6 then (pkgs.writeTextDir "jvm.options" cfg.jvmOptions) else "")
+      (if es5 || es6 then (pkgs.writeTextDir "log4j2.properties" cfg.logging)
               else (pkgs.writeTextDir "logging.yml" cfg.logging))
     ];
     # Elasticsearch 5.x won't start when the scripts directory does not exist
@@ -88,7 +92,7 @@ in {
     };
 
     heapSize = mkOption {
-      description = "Value for -Xms and -Xmx, eg. 1g means -Xms1g -Xmx1g";
+      description = "ES6 only: Value for -Xms and -Xmx, eg. 1g means -Xms1g -Xmx1g.";
       default = "1g";
       type = types.str;
     };
@@ -109,7 +113,7 @@ in {
     logging = mkOption {
       description = "Elasticsearch logging configuration.";
       default =
-        if es5 then ''
+        if es5 || es6 then ''
           logger.action.name = org.elasticsearch.action
           logger.action.level = info
 
@@ -137,7 +141,7 @@ in {
 
     jvmOptions = mkOption {
       type = types.string;
-      description = "JVM options. Defaults to the distributed jvm.options file";
+      description = "ES6 only: JVM options. Defaults to the distributed jvm.options file.";
       default = ''
         ## JVM configuration
         
@@ -284,9 +288,9 @@ in {
       path = [ pkgs.inetutils ];
       environment = {
         ES_HOME = cfg.dataDir;
-        ES_PATH_CONF = configDir;
         ES_JAVA_OPTS = toString ([ "-Des.path.conf=${configDir}" ] ++ cfg.extraJavaOptions);
-      };
+      } // if es6 then { ES_PATH_CONF = configDir; } else {};
+
       serviceConfig = {
         ExecStart = "${cfg.package}/bin/elasticsearch ${toString cfg.extraCmdLineOptions}";
         User = "elasticsearch";
