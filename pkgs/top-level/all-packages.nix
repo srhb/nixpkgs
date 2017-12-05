@@ -19503,6 +19503,8 @@ with pkgs;
 
   openfst = callPackage ../development/libraries/openfst {};
 
+  cerebro = callPackage ../servers/search/cerebro {};
+
   # `recurseIntoAttrs` for sake of hydra, not nix-env
   tests = recurseIntoAttrs {
     cc-wrapper = callPackage ../test/cc-wrapper { };
