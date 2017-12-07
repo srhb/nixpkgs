@@ -3,6 +3,7 @@
 import ./make-test.nix ({ pkgs, ...} :
 let
   cerebroUrl = "http://localhost:9000";
+  testPort = 9001;
 in { 
   name = "Cerebro";
 
@@ -14,6 +15,7 @@ in {
         cerebro = {
           enable = true;
           package = pkgs.cerebro;
+          port = testPort;
         };
       };
     };
@@ -23,6 +25,6 @@ in {
     startAll;
     # See if Cerebro is running locally.
     $one->waitForUnit("cerebro.service");
-    $one->waitUntilSucceeds("curl --silent --show-error 'http://localhost:9000'");
+    $one->waitUntilSucceeds("curl --silent --show-error 'http://localhost:${toString testPort}'");
   '';
 })
