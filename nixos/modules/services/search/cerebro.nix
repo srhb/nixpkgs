@@ -73,7 +73,7 @@ in {
     };
 
     systemd.services.cerebro = {
-      description = "Cerebro Code Search";
+      description = "Cerebro UI";
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
 
