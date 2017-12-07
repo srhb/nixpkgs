@@ -560,6 +560,7 @@
   ./services/search/kibana/kibana.nix
   ./services/search/kibana/kibana6.nix
   ./services/search/solr.nix
+  ./services/search/cerebro.nix
   ./services/security/clamav.nix
   ./services/security/fail2ban.nix
   ./services/security/fprintd.nix
