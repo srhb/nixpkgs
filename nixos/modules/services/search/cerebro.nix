@@ -48,14 +48,24 @@ in {
         '';
       };
 
-      listen = mkOption {
-        type = types.str;
-        default = "0.0.0.0:9000";
-        example = "127.0.0.1:9000 or just :9000";
-        description = ''
-          Listen on this IP:port / :port
-        '';
-      };
+      listenAddress = mkOption {
+      description = "Cerebro listen address.";
+      default = "0.0.0.0";
+      type = types.str;
+    };
+
+    port = mkOption {
+      description = "Cerebro port to listen for HTTP traffic.";
+      default = 9000;
+      type = types.int;
+    };
+
+      extraCmdLineOptions = mkOption {
+      description = "Extra command line options for Cerebro. Could be a local config e.g. -Dconfig.file=/some/other/dir/alternate.conf";
+      default = [];
+      type = types.listOf types.str;
+     };
+
     };
   };
 
@@ -78,7 +88,7 @@ in {
       after = [ "network.target" ];
 
       serviceConfig = {
-        ExecStart = "${pkgs.cerebro}/bin/cerebro";
+        ExecStart = "${pkgs.cerebro}/bin/cerebro -Dhttp.port=${toString cfg.port} --Dhttp.address={toString cfg.listenAdress} ${toString cfg.extraCmdLineOptions}";
         User = cfg.user;
         Group = cfg.group;
         WorkingDirectory = cfg.home;
