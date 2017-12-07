@@ -9,21 +9,20 @@ in {
 
   nodes = {
     one =
-      { config, pkgs, ... }: {
-          services = {
-            cerebro = {
-              enable = true;
-              package = pkgs.cerebro;
-            };
-
-          };
+    { config, pkgs, ... }: {
+      services = {
+        cerebro = {
+          enable = true;
+          package = pkgs.cerebro;
         };
+      };
     };
+  };
 
   testScript = ''
     startAll;
     # See if Cerebro is running locally.
     $one->waitForUnit("cerebro.service");
     $one->waitUntilSucceeds("curl --silent --show-error 'http://localhost:9000'");
-    '';
+  '';
 })

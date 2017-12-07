@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, jre_headless, makeWrapper }:
+{ stdenv, lib, fetchurl, jre_headless, makeWrapper, gawk }:
 
 stdenv.mkDerivation rec {
   name = "cerebro-${version}";
@@ -9,13 +9,15 @@ stdenv.mkDerivation rec {
     sha256 = "0jlvzbng21ps09v5vwx9mh6jfb5mwkwirm8mrvam09c356yikw63";
   };
 
-  buildInputs = [ makeWrapper jre_headless ];
+  buildInputs = [ makeWrapper jre_headless gawk ];
 
   installPhase = ''
     mkdir $out
     cp -r bin conf lib README.md $out/
 
-    wrapProgram $out/bin/cerebro --set JAVA_HOME "${jre_headless}"
+    wrapProgram $out/bin/cerebro \
+      --set JAVA_HOME "${jre_headless}" \
+      --prefix PATH : ${lib.makeBinPath [ gawk ]}
 
     substituteInPlace $out/conf/application.conf --replace 'data.path = "./cerebro.db"' 'data.path = "/tmp/cerebro.db"'
 

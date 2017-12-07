@@ -76,10 +76,6 @@ in {
       description = "Cerebro Code Search";
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
-      path = [ pkgs.jre ];
-      environment = {
-        JAVA_HOME = "${pkgs.jre}";
-      };
 
       serviceConfig = {
         ExecStart = "${pkgs.cerebro}/bin/cerebro";
