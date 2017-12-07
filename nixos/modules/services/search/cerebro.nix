@@ -76,12 +76,13 @@ in {
       description = "Cerebro Code Search";
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
-      script = ''
-        #!/bin/sh
-        exec ${pkgs.cerebro}/bin/cerebro \
-      '';
+      path = [ pkgs.jre ];
+      environment = {
+        JAVA_HOME = "${pkgs.jre}";
+      };
 
       serviceConfig = {
+        ExecStart = "${pkgs.cerebro}/bin/cerebro";
         User = cfg.user;
         Group = cfg.group;
         WorkingDirectory = cfg.home;
