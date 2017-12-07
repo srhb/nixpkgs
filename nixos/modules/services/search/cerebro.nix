@@ -1,0 +1,92 @@
+{ config, lib, pkgs, ... }:
+with lib;
+let
+  cfg = config.services.cerebro;
+in {
+  options = {
+    services.cerebro = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Whether to enable the Cerebro Elasticsearch GUI.
+        '';
+      };
+
+      user = mkOption {
+        default = "cerebro";
+        type = types.str;
+        description = ''
+          User cerebro should execute under.
+        '';
+      };
+
+      group = mkOption {
+        default = "cerebro";
+        type = types.str;
+        description = ''
+          Group cerebro should execute under.
+        '';
+      };
+
+      home = mkOption {
+        default = "/var/lib/cerebro";
+        type = types.path;
+        description = ''
+          The path to use as cerebro's $HOME. If the default user
+          "cerebro" is configured then this is the home of the "cerebro"
+          user.
+        '';
+      };
+
+      package = mkOption {
+        default = pkgs.cerebro;
+        defaultText = "pkgs.cerebro";
+        type = types.package;
+        description = ''
+          Package for running cerebro.
+        '';
+      };
+
+      listen = mkOption {
+        type = types.str;
+        default = "0.0.0.0:9000";
+        example = "127.0.0.1:9000 or just :9000";
+        description = ''
+          Listen on this IP:port / :port
+        '';
+      };
+    };
+  };
+
+  config = mkIf cfg.enable {
+    users.extraGroups = optional (cfg.group == "cerebro") {
+      name = "cerebro";
+    };
+
+    users.extraUsers = optional (cfg.user == "cerebro") {
+      name = "cerebro";
+      description = "cerebro elasticsearch admin UI";
+      createHome = true;
+      home = cfg.home;
+      group = cfg.group;
+    };
+
+    systemd.services.cerebro = {
+      description = "Cerebro Code Search";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "network.target" ];
+      script = ''
+        #!/bin/sh
+        exec ${pkgs.cerebro}/bin/cerebro \
+      '';
+
+      serviceConfig = {
+        User = cfg.user;
+        Group = cfg.group;
+        WorkingDirectory = cfg.home;
+      };
+    };
+  };
+
+}
