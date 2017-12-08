@@ -86,8 +86,6 @@ in {
         node.name = "elasticsearch";
         node.master = true;
         node.data = false;
-        index.number_of_shards = 5;
-        index.number_of_replicas = 1;
       };
     };
 
