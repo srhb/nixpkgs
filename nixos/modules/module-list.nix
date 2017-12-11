@@ -153,6 +153,7 @@
   ./services/backup/bacula.nix
   ./services/backup/crashplan.nix
   ./services/backup/mysql-backup.nix
+  ./services/backup/networker.nix
   ./services/backup/postgresql-backup.nix
   ./services/backup/rsnapshot.nix
   ./services/backup/tarsnap.nix

@@ -3432,6 +3432,8 @@ with pkgs;
 
   netcdffortran = callPackage ../development/libraries/netcdf-fortran { };
 
+  networker = callPackage ../tools/backup/networker { };
+
   neural-style = callPackage ../tools/graphics/neural-style {};
 
   nco = callPackage ../development/libraries/nco { };
