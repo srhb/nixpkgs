@@ -106,6 +106,23 @@ in {
     };
   };
 
+  elasticsearch_readonlyrest = esPlugin rec {
+    name = "elasticsearch-readonlyrest-${version}";
+    pluginName = "elasticsearch-readonlyrest";
+    version = "1.16.14";
+    src = fetchurl {
+      url = "https://artifactory.dbc.dk/artifactory/binary-platform/elasticsearch/readonlyrest/readonlyrest-1.16.14_es6.0.0.zip";
+      sha256 = "3bb44c30756a0d07a37652f85abbcd0676ab744640b83ff8b7b7d760e7883eb1";
+      name = "readonlyrest-${version}_es6.0.0.zip";
+    };
+
+    meta = {
+      homepage = https://github.com/sscarduzio/elasticsearch-readonlyrest-plugin;
+      description = "Elasticsearch and Kibana security plugin";
+      license = licenses.gpl3;
+    };
+  };
+
   search_guard = esPlugin rec {
     name = "elastic-search-guard-${version}";
     pluginName = "search-guard";
