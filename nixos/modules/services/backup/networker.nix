@@ -63,8 +63,11 @@ with lib;
       wantedBy = [ "multi-user.target" ];
       after    = [ "network.target" "local-fs.target" ];
 
+      path = [ pkgs.coreutils ];
+
       serviceConfig = {
-        ExecStart = "${pkgs.networker}/bin/nsrexecd -s ${cfg.server}";
+        Type = "forking";
+        ExecStart = "-${pkgs.networker}/bin/nsrexecd -s ${cfg.server}";
       };
 
       preStart = ''
