@@ -47,14 +47,14 @@ stdenv.mkDerivation rec {
     ];
   in
   ''
-    # Path interpreter and rpath of all executables and shared objects
+    # Patch interpreter and rpath of all executables and shared objects
     for file in $(find $out -type f \( -executable -o -name \*.so\* \) ); do
       patchelf --set-interpreter \
         ${stdenv.glibc}/lib/ld-linux-x86-64.so.2 $file || true
       patchelf --set-rpath ${rpath} $file || true
     done
 
-    # networker has strong opinions on its executables 
+    # Networker has strong opinions on its executables
     # being hardlinked. To avoid failing in case this has happened,
     # we ensure that stat lies to nsrexecd when it probes itself.
 

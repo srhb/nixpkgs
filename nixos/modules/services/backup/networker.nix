@@ -77,9 +77,10 @@ with lib;
         ln -s "${nsrRootFile}" /.nsr
       '';
 
+      # FIXME: Find a solution to these paths not being configurable.
       # We get rid of these whenever we stop to prevent file leakage on disk.
-      # Yes, it's ugly, but they are not configurable in nsrexecd so we cannot
-      # fence them behind the system activation link.
+      # Because they're not configurable, we can't fence them behind the
+      # system activation link, which makes unclean shutdowns tricky.
       postStop = ''
         rm /nsr
         rm /.nsr
