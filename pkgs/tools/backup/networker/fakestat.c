@@ -20,8 +20,10 @@ int prefix(const char* start, const char *whole)
   return 1;
 }
 
-# libc wraps stat and company and therefore cannot be overwritten directly.
-# Instead, patch __xstat and __xstat64 which will wrap the actual call.
+/*
+ * libc wraps stat and company and therefore cannot be overwritten directly.
+ * Instead, patch __xstat and __xstat64 which will wrap the actual call.
+ */
 int __xstat(int ver, const char *path, struct stat *buf)
 {
   xstat_func_t orig_xstat;
@@ -30,7 +32,7 @@ int __xstat(int ver, const char *path, struct stat *buf)
   int retval;
   retval = orig_xstat(ver, path, buf);
 
-  # Set hardlink count to zero when path is prefixed by STOREPATH
+  // Set hardlink count to zero when path is prefixed by STOREPATH
   if (prefix(STOREPATH,path))
   {
     buf->st_nlink = 0;
@@ -47,7 +49,7 @@ int __xstat64(int ver, const char *path, struct stat64 *buf)
   int retval;
   retval = orig_xstat64(ver, path, buf);
 
-  # Set hardlink count to zero when path is prefixed by STOREPATH
+  // Set hardlink count to zero when path is prefixed by STOREPATH
   if (prefix(STOREPATH,path))
   {
     buf->st_nlink = 0;
