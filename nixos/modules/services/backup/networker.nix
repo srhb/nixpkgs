@@ -35,10 +35,10 @@ with lib;
         '';
       };
 
-      server = mkOption {
-        type = types.string;
+      servers = mkOption {
+        type = with types; listOf string;
         description = ''
-          The trusted hostname allowed to execute commands (as root!) on this
+          The trusted hostnames allowed to execute commands (as root!) on this
           system.
         '';
       };
@@ -67,7 +67,8 @@ with lib;
 
       serviceConfig = {
         Type = "forking";
-        ExecStart = "-${pkgs.networker}/bin/nsrexecd -s ${cfg.server}";
+        ExecStart = "-${pkgs.networker}/bin/nsrexecd${lib.concatMapStrings
+          (server: " -s ${server}") cfg.servers}";
       };
 
       preStart = ''
