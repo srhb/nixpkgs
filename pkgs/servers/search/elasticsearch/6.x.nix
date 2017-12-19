@@ -11,8 +11,6 @@ stdenv.mkDerivation rec {
     sha256 = "1x6rwf8y64cafs9i1ypxhrqy9r796w3pf0zn8i94i1mrm1vyh804";
   };
 
-  patches = [ ];
-
   buildInputs = [ makeWrapper jre_headless ] ++
     (if (!stdenv.isDarwin) then [utillinux] else [getopt]);
 
@@ -21,6 +19,17 @@ stdenv.mkDerivation rec {
     cp -R bin config lib modules plugins $out
 
     chmod -x $out/bin/*.*
+    cat > $out/bin/elasticsearch-env <<-EOF
+      if [ -z "\$ES_HOME" ]; then
+          echo "You must set the ES_HOME var" >&2
+          exit 1
+      fi
+      if [ -z "\$ES_PATH_CONF" ]; then
+          echo "You must set the ES_PATH_CONF var" >&2
+          exit 1
+      fi
+      JAVA="${jre_headless}"/bin/java
+    EOF
 
     wrapProgram $out/bin/elasticsearch \
       --prefix ES_CLASSPATH : "$out/lib/*" \
