@@ -28,7 +28,6 @@ stdenv.mkDerivation rec {
           echo "You must set the ES_PATH_CONF var" >&2
           exit 1
       fi
-      ES_CLASSPATH="$out/lib/*"
       JAVA="${jre_headless}"/bin/java
     EOF
 
