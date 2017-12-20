@@ -25,11 +25,19 @@ in
         '';
       };
       
-      address = mkOption {
+      listenAddress = mkOption {
         type = types.string;
-        default = "127.0.0.1:8888";
+        default = "127.0.0.1";
         description = ''
-          Address and port to listen on
+          Address to listen on
+        '';
+      };
+
+      port = mkOption {
+        type = types.int;
+        default = 8888;
+        description = ''
+          Port to listen on
         '';
       };
       
@@ -84,7 +92,7 @@ in
         path = [ pkgs.cfssl ];
 
         serviceConfig = {
-          ExecStart = "${pkgs.cfssl}/bin/cfssl serve -ca ${toString cfg.ca} -ca-key ${toString cfg.caKey} -loglevel ${toString cfg.logLevel}";
+          ExecStart = "${pkgs.cfssl}/bin/cfssl serve -address ${cfg.listenAddress} -port ${toString cfg.port} -ca ${toString cfg.ca} -ca-key ${toString cfg.caKey} -loglevel ${toString cfg.logLevel}";
           Restart = "always";
         };
       };
