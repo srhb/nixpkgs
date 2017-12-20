@@ -46,6 +46,14 @@ in
           Path to PEM-encoded private key
         '';
       };
+
+      logLevel = mkOption {
+        type = types.int;
+        default = 1;
+        description = ''
+          Loglevel. See CFSSL documentation.
+        '';
+      };
     };
     
   };
@@ -76,7 +84,7 @@ in
         path = [ pkgs.cfssl ];
 
         serviceConfig = {
-          ExecStart = "${pkgs.cfssl}/bin/cfssl serve -ca ${toString cfg.ca} -ca-key ${toString cfg.caKey}";
+          ExecStart = "${pkgs.cfssl}/bin/cfssl serve -ca ${toString cfg.ca} -ca-key ${toString cfg.caKey} -loglevel ${toString cfg.logLevel}";
           Restart = "always";
         };
       };
