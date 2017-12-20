@@ -1,0 +1,100 @@
+{ config, lib, pkgs, ... }:
+
+with lib;
+
+let
+
+  cfg = config.services.cfssl;
+
+in
+
+
+{
+
+  ###### interface
+
+  options = {
+
+    services.cfssl = {
+
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Whether to enable the CFSSL API server 
+        '';
+      };
+      
+      listenAddress = mkOption {
+        type = types.string;
+        default = "127.0.0.1";
+        description = ''
+          Address to listen on
+        '';
+      };
+
+      port = mkOption {
+        type = types.int;
+        default = 8888;
+        description = ''
+          Port to listen on
+        '';
+      };
+      
+      ca = mkOption {
+        type = types.path;
+        description = ''
+          Path to PEM-encoded certificate
+        '';
+      };
+
+      caKey = mkOption {
+        type = types.path;
+        description = ''
+          Path to PEM-encoded private key
+        '';
+      };
+
+      logLevel = mkOption {
+        type = types.int;
+        default = 1;
+        description = ''
+          Loglevel. See CFSSL documentation.
+        '';
+      };
+    };
+    
+  };
+  
+  
+  ###### implementation
+  
+  config = mkIf cfg.enable {
+    users = {
+      extraUsers.cfssl = {
+        uid = config.ids.uids.cfssl;
+        group = "cfssl";
+        description = "CFSSL daemon user";
+      };
+
+      extraGroups.cfssl = {
+        name = "cfssl";
+        gid = config.ids.gids.cfssl;
+      };
+    };
+
+  
+    systemd.services.cfssl =
+      { description = "CFSSL API Server";
+        wantedBy = [ "multi-user.target" ];
+        after = [ "networking.target" ];
+
+        path = [ pkgs.cfssl ];
+
+        serviceConfig = {
+          ExecStart = "${pkgs.cfssl}/bin/cfssl serve -address ${cfg.listenAddress} -port ${toString cfg.port} -ca ${toString cfg.ca} -ca-key ${toString cfg.caKey} -loglevel ${toString cfg.logLevel}";
+          Restart = "always";
+        };
+      };
+  };
+}
