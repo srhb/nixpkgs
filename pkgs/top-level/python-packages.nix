@@ -4070,23 +4070,7 @@ in {
     doCheck = false;
   };
 
-  pytestquickcheck = buildPythonPackage rec {
-    name = "pytest-quickcheck-0.8.2";
-
-    src = pkgs.fetchurl {
-      url = "mirror://pypi/p/pytest-quickcheck/pytest-quickcheck-0.8.2.tar.gz";
-      sha256 = "047w4zwdsnlzmsc5f3rapzbzd2frlvz9nnp8v4b48fjmqmxassh3";
-    };
-
-    buildInputs = with self; [ pytest ];
-    propagatedBuildInputs = with self; [ pytestflakes pytestpep8 tox ];
-
-    meta = {
-      license = licenses.asl20;
-      homepage = "https://pypi.python.org/pypi/pytest-quickcheck";
-      description = "pytest plugin to generate random data inspired by QuickCheck";
-    };
-  };
+  pytestquickcheck = callPackage ../development/python-modules/pytest-quickcheck { };
 
   pytest-server-fixtures = buildPythonPackage rec {
     name = "${pname}-${version}";
@@ -6315,7 +6299,7 @@ in {
     meta = {
       description = "A Task-Based Parallelization Framework";
       license = licenses.mit;
-      url = https://jug.readthedocs.io/;
+      homepage = https://jug.readthedocs.io/;
       maintainers = with maintainers; [ luispedro ];
     };
   };
@@ -8343,6 +8327,8 @@ in {
   # Override the package set and set e.g. `django = super.django_1_9`.
   # See the Nixpkgs manual for examples on how to override the package set.
   django_hijack = callPackage ../development/python-modules/django-hijack { };
+
+  django_hijack_admin = callPackage ../development/python-modules/django-hijack-admin { };
 
   django_nose = buildPythonPackage rec {
     name = "django-nose-${version}";
@@ -18548,7 +18534,7 @@ in {
       description = "Download files using requests and save them to a target path";
       homepage = https://www.github.com/takluyver/requests_download;
       license = licenses.mit;
-      maintainer = maintainers.fridh;
+      maintainers = [ maintainers.fridh ];
     };
   };
 
@@ -22127,7 +22113,7 @@ in {
       description = "Collection of utilities for interacting with PyPI";
       homepage = https://github.com/pypa/twine;
       license = licenses.asl20;
-      maintainer = with maintainers; [ fridh ];
+      maintainers = with maintainers; [ fridh ];
     };
   };
 
@@ -26993,7 +26979,7 @@ EOF
       description = "Read and write ZIP files - backport of the zipfile module from Python 3.6";
       homepage = https://gitlab.com/takluyver/zipfile36;
       license = licenses.psfl;
-      maintainer = maintainers.fridh;
+      maintainers = [ maintainers.fridh ];
     };
   };
 
@@ -27031,7 +27017,7 @@ EOF
 
   preshed = callPackage ../development/python-modules/preshed { };
 
-  backports_weakref = callPackage ../development/python-modules/backports_weakref { }; 
+  backports_weakref = callPackage ../development/python-modules/backports_weakref { };
 
   thinc = callPackage ../development/python-modules/thinc { };
 
@@ -27040,7 +27026,7 @@ EOF
   behave = callPackage ../development/python-modules/behave { };
 
   pyhamcrest = callPackage ../development/python-modules/pyhamcrest { };
- 
+
   parse = callPackage ../development/python-modules/parse { };
 
   parse-type = callPackage ../development/python-modules/parse-type { };

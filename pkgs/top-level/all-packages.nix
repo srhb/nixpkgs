@@ -2179,6 +2179,8 @@ with pkgs;
 
   genimage = callPackage ../tools/filesystems/genimage { };
 
+  gerrit = callPackage ../applications/version-management/gerrit { };
+
   geteltorito = callPackage ../tools/misc/geteltorito { };
 
   getmail = callPackage ../tools/networking/getmail { };
@@ -3010,6 +3012,10 @@ with pkgs;
   nodejs-slim-8_x = callPackage ../development/web/nodejs/v8.nix {
     libtool = darwin.cctools;
     enableNpm = false;
+  };
+
+  nodePackages_8_x = callPackage ../development/node-packages/default-v8.nix {
+    nodejs = pkgs.nodejs-8_x;
   };
 
   nodePackages_6_x = callPackage ../development/node-packages/default-v6.nix {
@@ -6133,6 +6139,12 @@ with pkgs;
   rustStable = callPackage ../development/compilers/rust {
     inherit (llvmPackages_4) llvm;
   };
+
+  rust119bin = lowPrio (callPackage ../development/compilers/rust/1.19.0-bin.nix {
+     buildRustPackage = callPackage ../build-support/rust {
+       rust = rust119bin;
+     };
+  });
   rustBeta = lowPrio (recurseIntoAttrs (callPackage ../development/compilers/rust/beta.nix {}));
 
   rustNightly = rustBeta;
@@ -8590,6 +8602,10 @@ with pkgs;
   hunspellWithDicts = dicts: callPackage ../development/libraries/hunspell/wrapper.nix { inherit dicts; };
 
   hwloc = callPackage ../development/libraries/hwloc {};
+
+  hwloc-nox = callPackage ../development/libraries/hwloc {
+    x11Support = false;
+  };
 
   hydra = callPackage ../development/tools/misc/hydra { };
 
@@ -12484,10 +12500,8 @@ with pkgs;
 
     sch_cake = callPackage ../os-specific/linux/sch_cake { };
 
-    inherit (callPackage ../os-specific/linux/spl {
-      configFile = "kernel";
-      inherit kernel;
-    }) splStable splUnstable;
+    inherit (callPackage ../os-specific/linux/spl {})
+      splStable splUnstable;
 
     spl = splStable;
 
@@ -12818,10 +12832,6 @@ with pkgs;
   smem = callPackage ../os-specific/linux/smem { };
 
   statifier = callPackage ../os-specific/linux/statifier { };
-
-  inherit (callPackage ../os-specific/linux/spl {
-    configFile = "user";
-  }) splStable splUnstable;
 
   sysdig = callPackage ../os-specific/linux/sysdig {
     kernel = null;
@@ -14491,6 +14501,8 @@ with pkgs;
       python = python2;
       gnused = gnused_422;
       icu = icu59;
+      cargo = rust119bin.cargo;
+      rustc = rust119bin.rustc;
     };
   });
 
@@ -15421,7 +15433,9 @@ with pkgs;
 
   monero = callPackage ../applications/misc/monero { };
 
-  xmr-stak = callPackage ../applications/misc/xmr-stak { };
+  xmr-stak = callPackage ../applications/misc/xmr-stak {
+    hwloc = hwloc-nox;
+  };
 
   monkeysAudio = callPackage ../applications/audio/monkeys-audio { };
 
@@ -19178,6 +19192,7 @@ with pkgs;
     terraform_0_8
     terraform_0_9
     terraform_0_10
+    terraform_0_11
     ;
 
   # Terraform with all the plugins, both to get Hydra to build all plugins for us and for
