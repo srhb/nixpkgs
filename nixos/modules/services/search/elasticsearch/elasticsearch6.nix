@@ -28,6 +28,8 @@ let
   pluginsPath = pkgs.buildEnv {
     name = "elasticsearch-plugins";
     paths = cfg.plugins;
+
+    postBuild = "${pkgs.coreutils}/bin/mkdir -p $out/plugins";
   };
 
 in {
