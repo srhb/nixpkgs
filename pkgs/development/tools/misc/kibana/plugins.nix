@@ -28,8 +28,8 @@ in {
     version = "1.16.14";
     src = fetchurl {
       url = "https://artifactory.dbc.dk/artifactory/binary-platform/kibana/readonlyrest/readonlyrest_kbn_pro-1.16.14-20171211_es6.0.0.zip";
-      sha256 = "96b5fa00897263b6ac955dd7c62603b1f66cd6cfb777ace89157f85877ab7796";
-      name = "readonlyrest_kbn_pro-${version}-20171211_es6.0.0.zip";
+      sha256 = "956f7d411c7a2a839ebce70deed94f2f06cbcefc8e02dc6132978aac8013a38c";
+      name = "readonlyrest_kbn_pro-${version}-20180108_es6.0.0.zip";
     };
 
     meta = {
