@@ -25,6 +25,7 @@ in {
           # memory: compulsory panic_on_oom is enabled" so lets give it even a
           # bit more room:
           virtualisation.memorySize = 3000;
+          nixpkgs.config.allowUnfree = true;
 
           # For querying JSON objects returned from elasticsearch and kibana.
           environment.systemPackages = [ pkgs.jq ];
@@ -56,7 +57,7 @@ in {
             elasticsearch6 = {
               enable = true;
               package = pkgs.elasticsearch6;
-              plugins = [ pkgs.elasticsearchPlugins.elasticsearch_readonlyrest ];
+              plugins = [ pkgs.elasticsearch6Plugins.elasticsearch_readonlyrest ];
               extraConfig = {
                 network.host = "0.0.0.0";
                 readonlyrest.access_control_rules = [
@@ -73,6 +74,7 @@ in {
             };
 
             kibana6 = {
+              package = pkgs.kibana6.override { plugins = [ pkgs.kibana6Plugins.kibana_readonlyrest ]; };
               enable = true;
               elasticsearch.url = esUrl;
             };
