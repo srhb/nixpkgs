@@ -1,28 +1,8 @@
-{ pkgs, stdenv, fetchurl, fetchFromGitHub, unzip, kibana }:
+{ pkgs, fetchurl }:
 
 with pkgs.lib;
-
-let
-  kibanaPlugin = a@{
-    pluginName,
-    installPhase ? ''
-      mkdir -p $out/bin
-      KIBANA_HOME=$out ${kibana}/bin/kibana-plugin --install ${pluginName} --url file://$src
-    '',
-    ...
-  }:
-    stdenv.mkDerivation (a // {
-      inherit installPhase;
-      unpackPhase = "true";
-      buildInputs = [ unzip ];
-      meta = a.meta // {
-        platforms = kibana.meta.platforms;
-        maintainers = (a.meta.maintainers or []) ++ [ maintainers.offline ];
-      };
-    });
-in {
-
- kibana_readonlyrest = kibanaPlugin rec {
+{
+ kibana_readonlyrest = rec {
     name = "kibana-readonlyrest-${version}";
     pluginName = "kibana-readonlyrest";
     version = "1.16.14";

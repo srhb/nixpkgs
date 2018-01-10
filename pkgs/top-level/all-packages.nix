@@ -1876,7 +1876,7 @@ with pkgs;
   );
 
   kibana6Plugins = recurseIntoAttrs (
-    callPackage ../development/tools/misc/kibana/plugins.nix { kibana = kibana6; }
+    callPackage ../development/tools/misc/kibana/plugins.nix { }
   );
 
   emem = callPackage ../applications/misc/emem { };
