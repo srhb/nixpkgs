@@ -1,4 +1,4 @@
-{ stdenv, makeWrapper, fetchurl, elk6Version, nodejs, coreutils, which }:
+{ stdenv, makeWrapper, fetchurl, elk6Version, nodejs, coreutils, which, plugins ? [] }:
 
 with stdenv.lib;
 let
@@ -30,9 +30,16 @@ in stdenv.mkDerivation rec {
     mkdir -p $out/libexec/kibana $out/bin
     mv * $out/libexec/kibana/
     rm -r $out/libexec/kibana/node
+
     makeWrapper $out/libexec/kibana/bin/kibana $out/bin/kibana \
       --prefix PATH : "${stdenv.lib.makeBinPath [ nodejs coreutils which ]}"
     sed -i 's@NODE=.*@NODE=${nodejs}/bin/node@' $out/libexec/kibana/bin/kibana
+
+    makeWrapper $out/libexec/kibana/bin/kibana-plugin $out/bin/kibana-plugin \
+      --prefix PATH : "${stdenv.lib.makeBinPath [ nodejs coreutils which ]}"
+    sed -i 's@NODE=.*@NODE=${nodejs}/bin/node@' $out/libexec/kibana/bin/kibana-plugin
+
+    ${stdenv.lib.concatMapStringsSep "\n" (plugin: "$out/bin/kibana-plugin install file://${toString plugin.src}") plugins} 
   '';
 
   meta = {

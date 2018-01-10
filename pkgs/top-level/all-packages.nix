@@ -1867,6 +1867,14 @@ with pkgs;
     callPackage ../servers/search/elasticsearch/plugins.nix { }
   );
 
+  elasticsearch6Plugins = recurseIntoAttrs (
+    callPackage ../servers/search/elasticsearch/plugins.nix { elasticsearch = elasticsearch; }
+  );
+
+  kibana6Plugins = recurseIntoAttrs (
+    callPackage ../development/tools/misc/kibana/plugins.nix { }
+  );
+
   emem = callPackage ../applications/misc/emem { };
 
   emv = callPackage ../tools/misc/emv { };

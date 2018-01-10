@@ -25,6 +25,7 @@ in {
           # memory: compulsory panic_on_oom is enabled" so lets give it even a
           # bit more room:
           virtualisation.memorySize = 3000;
+          nixpkgs.config.allowUnfree = true;
 
           # For querying JSON objects returned from elasticsearch and kibana.
           environment.systemPackages = [ pkgs.jq ];
@@ -56,7 +57,7 @@ in {
             elasticsearch6 = {
               enable = true;
               package = pkgs.elasticsearch6;
-              plugins = [ pkgs.elasticsearchPlugins.elasticsearch_readonlyrest ];
+              plugins = [ pkgs.elasticsearch6Plugins.elasticsearch_readonlyrest ];
               extraConfig = {
                 network.host = "0.0.0.0";
                 readonlyrest.access_control_rules = [
@@ -73,6 +74,7 @@ in {
             };
 
             kibana6 = {
+              package = pkgs.kibana6.override { plugins = [ pkgs.kibana6Plugins.kibana_readonlyrest ]; };
               enable = true;
               elasticsearch.url = esUrl;
             };
@@ -101,7 +103,9 @@ in {
 
     # See if kibana is healthy.
     $one->waitForUnit("kibana.service");
-    $one->waitUntilSucceeds("curl --silent --show-error 'http://localhost:5601/api/status' | jq .status.overall.state | grep green");
+    #$one->waitUntilSucceeds("curl --silent --show-error 'http://localhost:5601/api/status' | jq .status.overall.state | grep green");
+    $one->waitUntilSucceeds("curl --silent --show-error -d 'username=admin&password=dev&submit=true' -X POST 'localhost:5601/login?nextUrl=/api/status' -XPOST -H 'kbn-xsrf: api' -c cookie");
+    $one->waitUntilSucceeds("curl --silent --show-error -b cookie 'localhost:5601/api/status' | jq .status.overall.state | grep green");
 
     # See if logstash messages arive in elasticsearch.
     $one->waitUntilSucceeds("curl --silent --show-error '${esUrl}/_search' -H 'Content-Type: application/json' -d '{\"query\" : { \"match\" : { \"message\" : \"flowers\"}}}' | jq .hits.total | grep -v 0");
