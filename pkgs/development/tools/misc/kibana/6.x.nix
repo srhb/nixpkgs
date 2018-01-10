@@ -39,8 +39,6 @@ in stdenv.mkDerivation rec {
       --prefix PATH : "${stdenv.lib.makeBinPath [ nodejs coreutils which ]}"
     sed -i 's@NODE=.*@NODE=${nodejs}/bin/node@' $out/libexec/kibana/bin/kibana-plugin
 
-    # plugins = [ kibana_ror kibana_bedrefarver ];
-
     ${stdenv.lib.concatMapStringsSep "\n" (plugin: "$out/bin/kibana-plugin install file://${toString plugin.src}") plugins} 
   '';
 

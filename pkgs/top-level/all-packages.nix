@@ -1871,10 +1871,6 @@ with pkgs;
     callPackage ../servers/search/elasticsearch/plugins.nix { elasticsearch = elasticsearch; }
   );
 
-  kibanaPlugins = recurseIntoAttrs (
-    callPackage ../development/tools/misc/kibana/plugins.nix { }
-  );
-
   kibana6Plugins = recurseIntoAttrs (
     callPackage ../development/tools/misc/kibana/plugins.nix { }
   );
