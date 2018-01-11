@@ -5,11 +5,11 @@ with pkgs.lib;
  kibana_readonlyrest = rec {
     name = "kibana-readonlyrest-${version}";
     pluginName = "kibana-readonlyrest";
-    version = "1.16.14";
+    version = "1.16.15";
     src = fetchurl {
-      url = "https://artifactory.dbc.dk/artifactory/binary-platform/kibana/readonlyrest/readonlyrest_kbn_pro-1.16.14-20180108_es6.0.0.zip";
-      sha256 = "956f7d411c7a2a839ebce70deed94f2f06cbcefc8e02dc6132978aac8013a38c";
-      name = "readonlyrest_kbn_pro-${version}-20180108_es6.0.0.zip";
+      url = "https://artifactory.dbc.dk/artifactory/binary-platform/kibana/readonlyrest/readonlyrest_kbn_pro-${version}_es6.0.0.zip";
+      sha256 = "17a40cc90db9ce471488021c30b29b8a5baccef4d8e35d927127e2b6901ad302";
+      name = "readonlyrest_kbn_pro-${version}_es6.0.0.zip";
     };
 
     meta = {
