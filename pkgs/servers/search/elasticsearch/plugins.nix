@@ -109,10 +109,10 @@ in {
   elasticsearch_readonlyrest = esPlugin rec {
     name = "elasticsearch-readonlyrest-${version}";
     pluginName = "elasticsearch-readonlyrest";
-    version = "1.16.14";
+    version = "1.16.15";
     src = fetchurl {
-      url = "https://artifactory.dbc.dk/artifactory/binary-platform/elasticsearch/readonlyrest/readonlyrest-1.16.14_es6.0.0.zip";
-      sha256 = "3bb44c30756a0d07a37652f85abbcd0676ab744640b83ff8b7b7d760e7883eb1";
+      url = "https://artifactory.dbc.dk/artifactory/binary-platform/elasticsearch/readonlyrest/readonlyrest-${version}_es6.0.0.zip";
+      sha256 = "eb61410ae98f6f68121fd1e815eb04b940ca023248d91102896ca276aea7d48b";
       name = "readonlyrest-${version}_es6.0.0.zip";
     };
 
