@@ -1,27 +1,18 @@
-# Test   
-
-import ./make-test.nix ({ pkgs, ...} :
-let
-  # cerebroUrl = "http://localhost:9000";
-  # testPort = 9001;
-in { 
-  name = "elasticsearch-export";
-
+import ./make-test.nix {
+  name = "elasticsearch-exporter";
 
   nodes = {
-    one =
-    { config, pkgs, ... }: {
-      services = {
-         prometheus.elasticsearchExporter = {
-         enable = true;
-        };
+    one = { config, pkgs, ... }: {
+      services.prometheus.elasticsearchExporter = {
+        enable = true;
       };
     };
   };
 
   testScript = ''
     startAll;
-    # See if elasticsearch-exporter is running locally.
     $one->waitForUnit("prometheus-elasticsearch-exporter.service");
+    $one->waitForOpenPort(9108);
+    $one->succeed("curl -s http://127.0.0.1:9108/metrics");
   '';
-})
+}
