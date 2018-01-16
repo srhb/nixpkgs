@@ -40,9 +40,14 @@ in {
         default = "http://localhost:9200";
         type = types.str;
       };
-      web.listen-address = mkOption {
+      listenAddress = mkOption {
         description = "Address to listen on for web interface and telemetry";
-        default = ":9108";
+        default = "localhost";
+        type = types.str;
+      };
+      listenPort = mkOption {
+        description = "Port to listen on for web interface and telemetry";
+        default = "9108";
         type = types.str;
       };
       web.telemetry-path = mkOption {
@@ -62,17 +67,24 @@ in {
       after = [ "network.target" ];
 
       serviceConfig = {
-        ExecStart = ''
-          ${pkgs.prometheus-elasticsearch-exporter}/bin/elasticsearch_exporter \
-          -es.timeout ${cfg.es.timeout} \
-          -es.uri ${cfg.es.uri} \
-          -web.listen-address ${cfg.web.listen-address} \
-          -web.telemetry-path ${cfg.web.telemetry-path} \
-          ${optionalString (cfg.es.all == "true") ''-es.all''} \
-          ${optionalString (cfg.es.ca != "") ''-es.ca ${cfg.es.ca}''} \
-          ${optionalString (cfg.es.client-cert != "") ''-es.client-cert ${cfg.es.client-cert}''} \
-          ${optionalString (cfg.es.client-private-key != "") ''-es.client-private-key ${cfg.es.client-private-key}''} 
-        '';
+        ExecStart =
+        let
+          arg = with pkgs.lib; concatStringsSep " " ([
+               "${pkgs.prometheus-elasticsearch-exporter}/bin/elasticsearch_exporter"
+               "-es.timeout ${cfg.es.timeout}" 
+               "-es.uri ${cfg.es.uri}" 
+               "-web.listen-address ${cfg.listenAddress}:${cfg.listenPort}" 
+               "-web.telemetry-path ${cfg.web.telemetry-path}" 
+             ]
+             ++ optional (cfg.es.all)  "-es.all"
+             ++ optional (cfg.es.ca != "")  "-es.ca ${cfg.es.ca}"
+             ++ optional (cfg.es.client-cert !="")  "-es.client-cert ${cfg.es.client-cert}"
+             ++ optional (cfg.es.client-private-key !="")  "-es.client-private-key ${cfg.es.client-private-key}"
+          );
+        in
+          ''
+            ${arg}
+          '';
 
         User = "nobody";
         Restart = "always";

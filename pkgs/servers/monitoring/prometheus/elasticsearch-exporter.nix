@@ -18,7 +18,7 @@ buildGoPackage rec {
     description = "Prometheus exporter for elasticsearch";
     homepage = https://github.com/justwatchcom/elasticsearch_exporter;
     license = licenses.asl20;
-    maintainers = with maintainers; [ zwopir dominikschulz ];
+    maintainers = with maintainers; [ eskytthe ];
     platforms = platforms.unix;
   };
 }

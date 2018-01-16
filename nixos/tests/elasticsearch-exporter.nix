@@ -13,6 +13,6 @@ import ./make-test.nix {
     startAll;
     $one->waitForUnit("prometheus-elasticsearch-exporter.service");
     $one->waitForOpenPort(9108);
-    $one->succeed("curl -s http://127.0.0.1:9108/metrics");
+    $one->waitUntilSucceeds("curl -s http://127.0.0.1:9108/metrics| grep elasticsearch_node_stats_up");
   '';
 }
