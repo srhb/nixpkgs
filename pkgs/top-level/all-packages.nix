@@ -2983,6 +2983,9 @@ with pkgs;
 
   });
 
+
+  nixdeploy = haskell.lib.justStaticExecutables (haskellPackages.callPackage ../tools/package-management/nixdeploy {});
+
   netperf = callPackage ../applications/networking/netperf { };
 
   netsniff-ng = callPackage ../tools/networking/netsniff-ng { };
