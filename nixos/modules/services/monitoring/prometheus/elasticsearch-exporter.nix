@@ -47,8 +47,8 @@ in {
       };
       listenPort = mkOption {
         description = "Port to listen on for web interface and telemetry";
-        default = "9108";
-        type = types.str;
+        default = 9108;
+        type = types.int;
       };
       web.telemetry-path = mkOption {
         description = "Path under which to expose metrics";
@@ -73,7 +73,7 @@ in {
                "${pkgs.prometheus-elasticsearch-exporter}/bin/elasticsearch_exporter"
                "-es.timeout ${cfg.es.timeout}" 
                "-es.uri ${cfg.es.uri}" 
-               "-web.listen-address ${cfg.listenAddress}:${cfg.listenPort}" 
+               "-web.listen-address ${cfg.listenAddress}:${toString cfg.listenPort}" 
                "-web.telemetry-path ${cfg.web.telemetry-path}" 
              ]
              ++ optional (cfg.es.all)  "-es.all"
