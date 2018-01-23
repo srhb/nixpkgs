@@ -1,9 +1,9 @@
-{ stdenv, fetchurl, elk6Version, makeWrapper, jre_headless, utillinux, getopt }:
+{ stdenv, fetchurl, elk6Version_dbc, makeWrapper, jre_headless, utillinux, getopt }:
 
 with stdenv.lib;
 
 stdenv.mkDerivation rec {
-  version = elk6Version;
+  version = elk6Version_dbc;
   name = "elasticsearch-${version}";
 
   src = fetchurl {

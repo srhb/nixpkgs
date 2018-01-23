@@ -31,9 +31,9 @@ in {
           environment.systemPackages = [ pkgs.jq ];
 
           services = {
-            logstash6 = {
+            logstash6_dbc = {
               enable = true;
-              package = pkgs.logstash6;
+              package = pkgs.logstash6_dbc;
               inputConfig = ''
                 exec { command => "echo -n flowers" interval => 1 type => "test" }
                 exec { command => "echo -n dragons" interval => 1 type => "test" }
@@ -54,10 +54,10 @@ in {
               '';
             };
 
-            elasticsearch6 = {
+            elasticsearch6_dbc = {
               enable = true;
-              package = pkgs.elasticsearch6;
-              plugins = [ pkgs.elasticsearch6Plugins.elasticsearch_readonlyrest ];
+              package = pkgs.elasticsearch6_dbc;
+              plugins = [ pkgs.elasticsearch6Plugins_dbc.elasticsearch_readonlyrest ];
               extraConfig = {
                 network.host = "0.0.0.0";
                 readonlyrest.access_control_rules = [
@@ -67,14 +67,14 @@ in {
                   }
                 ];
               };
-              dataDirs = with config.services.elasticsearch6; [
+              dataDirs = with config.services.elasticsearch6_dbc; [
                 "${home}/data1"
                 "${home}/data2"
               ];
             };
 
-            kibana6 = {
-              package = pkgs.kibana6.override { plugins = [ pkgs.kibana6Plugins.kibana_readonlyrest ]; };
+            kibana6_dbc = {
+              package = pkgs.kibana6_dbc.override { plugins = [ pkgs.kibana6Plugins_dbc.kibana_readonlyrest ]; };
               enable = true;
               elasticsearch.url = esUrl;
             };

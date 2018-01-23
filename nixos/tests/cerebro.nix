@@ -1,10 +1,10 @@
-# Test cerebro standalone web app  
+# Test cerebro standalone web app
 
 import ./make-test.nix ({ pkgs, ...} :
 let
   cerebroUrl = "http://localhost:9000";
   testPort = 9001;
-in { 
+in {
   name = "Cerebro";
 
 

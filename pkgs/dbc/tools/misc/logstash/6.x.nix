@@ -1,7 +1,7 @@
-{ stdenv, fetchurl, elk6Version, makeWrapper, jre  }:
+{ stdenv, fetchurl, elk6Version_dbc, makeWrapper, jre  }:
 
 stdenv.mkDerivation rec {
-  version = elk6Version;
+  version = elk6Version_dbc;
   name = "logstash-${version}";
 
   src = fetchurl {

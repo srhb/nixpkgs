@@ -3,7 +3,7 @@
 with lib;
 
 let
-  cfg = config.services.kibana6;
+  cfg = config.services.kibana6_dbc;
 
   cfgFile = pkgs.writeText "kibana.json" (builtins.toJSON (
     (filterAttrsRecursive (n: v: v != null) ({
@@ -19,7 +19,7 @@ let
   )));
 
 in {
-  options.services.kibana6 = {
+  options.services.kibana6_dbc = {
     enable = mkEnableOption "enable kibana service";
 
     listenAddress = mkOption {
