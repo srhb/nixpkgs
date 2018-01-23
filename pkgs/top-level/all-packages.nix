@@ -707,11 +707,22 @@ with pkgs;
 
   bchunk = callPackage ../tools/cd-dvd/bchunk { };
 
-  inherit (callPackages ../misc/logging/beats { })
+  inherit (callPackages ../misc/logging/beats/5.x.nix { })
     filebeat
     heartbeat
     metricbeat
     packetbeat;
+
+  inherit (let beats6 = callPackages ../misc/logging/beats/6.x.nix { }; in {
+    filebeat6   = beats6.filebeat;
+    heartbeat6  = beats6.heartbeat;
+    metricbeat6 = beats6.metricbeat;
+    packetbeat6 = beats6.packetbeat;
+  })
+    filebeat6
+    heartbeat6
+    metricbeat6
+    packetbeat6;
 
   bfr = callPackage ../tools/misc/bfr { };
 
@@ -1855,12 +1866,14 @@ with pkgs;
   evemu = callPackage ../tools/system/evemu { };
 
   # The latest version used by elasticsearch, logstash, kibana and the the beats from elastic.
-  elk5Version = "5.6.1";
+  elk5Version = "5.6.6";
+  elk6Version = "6.1.2";
   elk6Version_dbc = "6.0.0";
 
   elasticsearch = callPackage ../servers/search/elasticsearch { };
   elasticsearch2 = callPackage ../servers/search/elasticsearch/2.x.nix { };
   elasticsearch5 = callPackage ../servers/search/elasticsearch/5.x.nix { };
+  elasticsearch6 = callPackage ../servers/search/elasticsearch/6.x.nix { };
   elasticsearch6_dbc = callPackage ../dbc/servers/search/elasticsearch/6.x.nix { };
 
   elasticsearchPlugins = recurseIntoAttrs (
@@ -2344,10 +2357,7 @@ with pkgs;
     callPackage ../tools/misc/graylog/plugins.nix { }
   );
 
-  gprof2dot = callPackage ../development/tools/profiling/gprof2dot {
-    # Using pypy provides significant performance improvements (~2x)
-    pythonPackages = pypyPackages;
-  };
+  gprof2dot = callPackage ../development/tools/profiling/gprof2dot { };
 
   graphviz = callPackage ../tools/graphics/graphviz {
     inherit (darwin.apple_sdk.frameworks) ApplicationServices;
@@ -2827,6 +2837,7 @@ with pkgs;
 
   kibana  = callPackage ../development/tools/misc/kibana { };
   kibana5 = callPackage ../development/tools/misc/kibana/5.x.nix { };
+  kibana6 = callPackage ../development/tools/misc/kibana/6.x.nix { };
   kibana6_dbc = callPackage ../dbc/development/tools/misc/kibana/6.x.nix { };
 
   kismet = callPackage ../applications/networking/sniffers/kismet { };
@@ -2893,6 +2904,7 @@ with pkgs;
 
   logstash  = callPackage ../tools/misc/logstash { };
   logstash5 = callPackage ../tools/misc/logstash/5.x.nix { };
+  logstash6 = callPackage ../tools/misc/logstash/6.x.nix { };
   logstash6_dbc = callPackage ../dbc/tools/misc/logstash/6.x.nix { };
 
   logstash-contrib = callPackage ../tools/misc/logstash/contrib.nix { };
@@ -5351,6 +5363,11 @@ with pkgs;
   clang-sierraHack = clang.override {
     name = "clang-wrapper-with-reexport-hack";
     useMacosReexportHack = true;
+    binutils = darwin.binutils.override {
+      cctools = darwin.cctools.override {
+        enableDumpNormalizedLibArgs = true;
+      };
+    };
   };
 
   clang_5  = llvmPackages_5.clang;
@@ -6686,17 +6703,17 @@ with pkgs;
   inherit (callPackage ../development/interpreters/ruby {})
     ruby_2_0_0
     ruby_2_1_10
-    ruby_2_2_8
-    ruby_2_3_5
-    ruby_2_4_2;
+    ruby_2_2_9
+    ruby_2_3_6
+    ruby_2_4_3;
 
   # Ruby aliases
   ruby = ruby_2_3;
   ruby_2_0 = ruby_2_0_0;
   ruby_2_1 = ruby_2_1_10;
-  ruby_2_2 = ruby_2_2_8;
-  ruby_2_3 = ruby_2_3_5;
-  ruby_2_4 = ruby_2_4_2;
+  ruby_2_2 = ruby_2_2_9;
+  ruby_2_3 = ruby_2_3_6;
+  ruby_2_4 = ruby_2_4_3;
 
   scsh = callPackage ../development/interpreters/scsh { };
 
@@ -6706,7 +6723,7 @@ with pkgs;
 
   spark = spark_21;
   spark_16 = callPackage ../applications/networking/cluster/spark { version = "1.6.3"; };
-  spark_21 = callPackage ../applications/networking/cluster/spark { version = "2.1.0"; };
+  spark_21 = callPackage ../applications/networking/cluster/spark { version = "2.1.2"; };
 
   spidermonkey_1_8_5 = callPackage ../development/interpreters/spidermonkey/1.8.5.nix { };
   spidermonkey_17 = callPackage ../development/interpreters/spidermonkey/17.nix { };
@@ -14084,7 +14101,7 @@ with pkgs;
 
   ekho = callPackage ../applications/audio/ekho { };
 
-  electron-cash = callPackage ../applications/misc/electron-cash { };
+  electron-cash = libsForQt5.callPackage ../applications/misc/electron-cash { };
 
   electrum = callPackage ../applications/misc/electrum { };
 
