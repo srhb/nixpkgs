@@ -1856,23 +1856,23 @@ with pkgs;
 
   # The latest version used by elasticsearch, logstash, kibana and the the beats from elastic.
   elk5Version = "5.6.1";
-  elk6Version = "6.0.0";
+  elk6Version_dbc = "6.0.0";
 
   elasticsearch = callPackage ../servers/search/elasticsearch { };
   elasticsearch2 = callPackage ../servers/search/elasticsearch/2.x.nix { };
   elasticsearch5 = callPackage ../servers/search/elasticsearch/5.x.nix { };
-  elasticsearch6 = callPackage ../servers/search/elasticsearch/6.x.nix { };
+  elasticsearch6_dbc = callPackage ../dbc/servers/search/elasticsearch/6.x.nix { };
 
   elasticsearchPlugins = recurseIntoAttrs (
     callPackage ../servers/search/elasticsearch/plugins.nix { }
   );
 
-  elasticsearch6Plugins = recurseIntoAttrs (
-    callPackage ../servers/search/elasticsearch/plugins.nix { elasticsearch = elasticsearch; }
+  elasticsearch6Plugins_dbc = recurseIntoAttrs (
+    callPackage ../dbc/servers/search/elasticsearch/plugins.nix { elasticsearch = elasticsearch; }
   );
 
-  kibana6Plugins = recurseIntoAttrs (
-    callPackage ../development/tools/misc/kibana/plugins.nix { }
+  kibana6Plugins_dbc = recurseIntoAttrs (
+    callPackage ../dbc/development/tools/misc/kibana/plugins.nix { }
   );
 
   emem = callPackage ../applications/misc/emem { };
@@ -2827,7 +2827,7 @@ with pkgs;
 
   kibana  = callPackage ../development/tools/misc/kibana { };
   kibana5 = callPackage ../development/tools/misc/kibana/5.x.nix { };
-  kibana6 = callPackage ../development/tools/misc/kibana/6.x.nix { };
+  kibana6_dbc = callPackage ../dbc/development/tools/misc/kibana/6.x.nix { };
 
   kismet = callPackage ../applications/networking/sniffers/kismet { };
 
@@ -2893,7 +2893,7 @@ with pkgs;
 
   logstash  = callPackage ../tools/misc/logstash { };
   logstash5 = callPackage ../tools/misc/logstash/5.x.nix { };
-  logstash6 = callPackage ../tools/misc/logstash/6.x.nix { };
+  logstash6_dbc = callPackage ../dbc/tools/misc/logstash/6.x.nix { };
 
   logstash-contrib = callPackage ../tools/misc/logstash/contrib.nix { };
 

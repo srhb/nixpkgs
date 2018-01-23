@@ -3,7 +3,7 @@
 with lib;
 
 let
-  cfg = config.services.elasticsearch6;
+  cfg = config.services.elasticsearch6_dbc;
 
   esConfig = builtins.toJSON ({
       network.host = cfg.listenAddress;
@@ -36,7 +36,7 @@ in {
 
   ###### interface
 
-  options.services.elasticsearch6 = {
+  options.services.elasticsearch6_dbc = {
     enable = mkOption {
       description = "Whether to enable elasticsearch.";
       default = false;

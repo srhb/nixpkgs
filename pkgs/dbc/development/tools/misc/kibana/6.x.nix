@@ -1,4 +1,4 @@
-{ stdenv, makeWrapper, fetchurl, elk6Version, nodejs, coreutils, which, plugins ? [] }:
+{ stdenv, makeWrapper, fetchurl, elk6Version_dbc, nodejs, coreutils, which, plugins ? [] }:
 
 with stdenv.lib;
 let
@@ -17,7 +17,7 @@ let
   };
 in stdenv.mkDerivation rec {
   name = "kibana-${version}";
-  version = elk6Version;
+  version = elk6Version_dbc;
 
   src = fetchurl {
     url = "https://artifacts.elastic.co/downloads/kibana/${name}-${plat}-${elasticArch}.tar.gz";

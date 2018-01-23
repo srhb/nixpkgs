@@ -3,13 +3,13 @@
 with lib;
 
 let
-  cfg = config.services.logstash6;
+  cfg = config.services.logstash6_dbc;
 
   lsConfig = builtins.toJSON cfg.extraConfig;
 
   settingsPath = pkgs.buildEnv {
     name = "logstash-settings";
-    paths = [ 
+    paths = [
       (pkgs.writeTextDir "logstash.yml" lsConfig)
       (pkgs.writeTextDir "log4j2.properties" cfg.logging)
     ];
@@ -34,7 +34,7 @@ in
 {
   ###### interface
 
-  options.services.logstash6 = {
+  options.services.logstash6_dbc = {
 
     enable = mkOption {
       type = types.bool;

@@ -256,7 +256,7 @@
   ./services/logging/logcheck.nix
   ./services/logging/logrotate.nix
   ./services/logging/logstash/logstash.nix
-  ./services/logging/logstash/logstash6.nix
+  ./dbc/services/logging/logstash/logstash6.nix
   ./services/logging/rsyslogd.nix
   ./services/logging/syslog-ng.nix
   ./services/logging/syslogd.nix
@@ -558,10 +558,10 @@
   ./services/scheduling/fcron.nix
   ./services/scheduling/marathon.nix
   ./services/search/elasticsearch/elasticsearch.nix
-  ./services/search/elasticsearch/elasticsearch6.nix
+  ./dbc/services/search/elasticsearch/elasticsearch6.nix
   ./services/search/hound.nix
   ./services/search/kibana/kibana.nix
-  ./services/search/kibana/kibana6.nix
+  ./dbc/services/search/kibana/kibana6.nix
   ./services/search/solr.nix
   ./services/search/cerebro.nix
   ./services/security/cfssl.nix
