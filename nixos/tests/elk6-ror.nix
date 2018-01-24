@@ -58,14 +58,21 @@ in {
               enable = true;
               package = pkgs.elasticsearch6_dbc;
               plugins = [ pkgs.elasticsearch6Plugins_dbc.elasticsearch_readonlyrest ];
+              extraConfigFiles = [
+                {
+                  filename = "readonlyrest.yml";
+                  contents = builtins.toJSON {
+                    readonlyrest.access_control_rules = [
+                      {
+                        name = "Block 1 - Allowing anything from localhost";
+                        hosts = ["127.0.0.1"];
+                      }
+                    ];
+                  };
+                }
+              ];
               extraConfig = {
                 network.host = "0.0.0.0";
-                readonlyrest.access_control_rules = [
-                  {
-                    name = "Block 1 - Allowing anything from localhost";
-                    hosts = ["127.0.0.1"];
-                  }
-                ];
               };
               dataDirs = with config.services.elasticsearch6_dbc; [
                 "${home}/data1"

@@ -24,11 +24,10 @@ in {
   elasticsearch_readonlyrest = esPlugin rec {
     name = "elasticsearch-readonlyrest-${version}";
     pluginName = "elasticsearch-readonlyrest";
-    version = "1.16.15";
+    version = "1.16.15_es6.1.1";
     src = fetchurl {
-      url = "https://artifactory.dbc.dk/artifactory/binary-platform/elasticsearch/readonlyrest/readonlyrest-${version}_es6.0.0.zip";
-      sha256 = "eb61410ae98f6f68121fd1e815eb04b940ca023248d91102896ca276aea7d48b";
-      name = "readonlyrest-${version}_es6.0.0.zip";
+      url = "https://artifactory.dbc.dk/artifactory/binary-platform/elasticsearch/readonlyrest/readonlyrest-${version}.zip";
+      sha256 = "1zbmmlps5b95dbdb7ppph58q5ij8160dwg6baxhrlch1dzvg2sbi";
     };
 
     meta = {

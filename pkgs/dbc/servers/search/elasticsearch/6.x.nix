@@ -8,8 +8,14 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "https://artifacts.elastic.co/downloads/elasticsearch/${name}.tar.gz";
-    sha256 = "1x6rwf8y64cafs9i1ypxhrqy9r796w3pf0zn8i94i1mrm1vyh804";
+    sha256 = "1dkl7crha5g8h9c1zs1ahcmv221cpipzkvk574g99gdi586ckb8c";
   };
+
+  patches = [ ./es-home-6.x.patch ];
+
+  postPatch = ''
+    sed -i "s|ES_CLASSPATH=\"\$ES_HOME/lib/\*\"|ES_CLASSPATH=\"$out/lib/*\"|" ./bin/elasticsearch-env
+  '';
 
   buildInputs = [ makeWrapper jre_headless ] ++
     (if (!stdenv.isDarwin) then [utillinux] else [getopt]);
@@ -19,20 +25,8 @@ stdenv.mkDerivation rec {
     cp -R bin config lib modules plugins $out
 
     chmod -x $out/bin/*.*
-    cat > $out/bin/elasticsearch-env <<-EOF
-      if [ -z "\$ES_HOME" ]; then
-          echo "You must set the ES_HOME var" >&2
-          exit 1
-      fi
-      if [ -z "\$ES_PATH_CONF" ]; then
-          echo "You must set the ES_PATH_CONF var" >&2
-          exit 1
-      fi
-      JAVA="${jre_headless}"/bin/java
-    EOF
 
     wrapProgram $out/bin/elasticsearch \
-      --prefix ES_CLASSPATH : "$out/lib/*" \
       ${if (!stdenv.isDarwin)
         then ''--prefix PATH : "${utillinux}/bin/"''
         else ''--prefix PATH : "${getopt}/bin"''} \
@@ -46,8 +40,6 @@ stdenv.mkDerivation rec {
     description = "Open Source, Distributed, RESTful Search Engine";
     license = licenses.asl20;
     platforms = platforms.unix;
-    maintainers = [
-      maintainers.apeschar
-    ];
+    maintainers = with maintainers; [ apeschar basvandijk ];
   };
 }

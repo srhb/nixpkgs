@@ -18,11 +18,12 @@ let
 
   configDir = pkgs.buildEnv {
     name = "elasticsearch-config";
-    paths = [
-      (pkgs.writeTextDir "elasticsearch.yml" esConfig)
-      (pkgs.writeTextDir "jvm.options" cfg.jvmOptions)
-      (pkgs.writeTextDir "log4j2.properties" cfg.logging)
-    ];
+    paths = with pkgs; [
+      (writeTextDir "elasticsearch.yml" esConfig)
+      (writeTextDir "jvm.options" cfg.jvmOptions)
+      (writeTextDir "log4j2.properties" cfg.logging)
+    ]
+    ++ map ({filename, contents, ...}: writeTextDir filename contents) cfg.extraConfigFiles;
   };
 
   pluginsPath = pkgs.buildEnv {
@@ -253,6 +254,23 @@ in {
       type = types.listOf types.package;
     };
 
+    extraConfigFiles= mkOption {
+      description = "Extra files in the home/config";
+      example = [ { filename = "configfile.yml"; contents = "foo: bar"; } ];
+      default = [];
+      type = with types; listOf (submodule {
+        options = {
+          filename = mkOption {
+            description = "File name";
+            type = str;
+          };
+          contents = mkOption {
+            description = "File content string";
+            type = str;
+          };
+        };
+      });
+    };
   };
 
   ###### implementation
@@ -270,7 +288,7 @@ in {
       environment = {
         ES_HOME = cfg.home;
         ES_PATH_CONF = configDir;
-        ES_JAVA_OPTS = toString ([ "-Des.path.conf=${configDir}" ] ++ cfg.extraJavaOptions);
+        ES_JAVA_OPTS = toString (cfg.extraJavaOptions);
       };
       serviceConfig = {
         ExecStart = "${cfg.package}/bin/elasticsearch ${toString cfg.extraCmdLineOptions}";
