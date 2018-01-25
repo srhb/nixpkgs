@@ -1,0 +1,11 @@
+diff -Naur a/plugin-security.policy b/plugin-security.policy
+--- a/plugin-security.policy        2018-01-10 15:15:10.000000000 +0100
++++ b/plugin-security.policy       2018-01-25 09:30:02.404714101 +0100
+@@ -5,4 +5,5 @@
+   permission java.util.PropertyPermission "*", "read,write";
+   permission java.lang.RuntimePermission "getClassLoader";
+   permission java.net.SocketPermission "*", "accept, resolve, connect";
+-};
+\ No newline at end of file
++  permission java.io.FilePermission "/nix/store/-", "read, readlink";
++};
