@@ -63,7 +63,7 @@ in {
           ${pkgs.cerebro}/bin/cerebro \
           -Dhttp.port=${toString cfg.port} \
           -Dhttp.address=${toString cfg.listenAddress} \
-          ${toString cfg.extraCmdLineOptions};
+          ${builtins.concatStringsSep " " cfg.extraCmdLineOptions};
         '';
         User = "cerebro";
         WorkingDirectory = cfg.home;
