@@ -59,12 +59,11 @@ in {
       after = [ "network.target" ];
 
       serviceConfig = {
-        ExecStart = ''
-          ${pkgs.cerebro}/bin/cerebro \
-          -Dhttp.port=${toString cfg.port} \
-          -Dhttp.address=${toString cfg.listenAddress} \
-          ${builtins.concatStringsSep " " cfg.extraCmdLineOptions};
-        '';
+        ExecStart = builtins.concatStringsSep " " ([
+            "${pkgs.cerebro}/bin/cerebro"
+            "-Dhttp.port=${toString cfg.port}"
+            "-Dhttp.address=${toString cfg.listenAddress}"
+          ] ++ cfg.extraCmdLineOptions);
         User = "cerebro";
         WorkingDirectory = cfg.home;
       };
