@@ -72,12 +72,16 @@ let
     keyFile = mkDefault cfg.kubeconfig.keyFile;
   };
 
-  cniConfig = pkgs.buildEnv {
-    name = "kubernetes-cni-config";
-    paths = imap (i: entry:
-      pkgs.writeTextDir "${toString (10+i)}-${entry.type}.conf" (builtins.toJSON entry)
-    ) cfg.kubelet.cni.config;
-  };
+  cniConfig =
+    if cfg.kubelet.cni.configDir == null then
+      (pkgs.buildEnv {
+        name = "kubernetes-cni-config";
+        paths = imap (i: entry:
+          pkgs.writeTextDir "${toString (10+i)}-${entry.type}.conf" (builtins.toJSON entry)
+        ) cfg.kubelet.cni.config;
+      })
+    else
+      (cfg.kubelet.cni.configDir);
 
   manifests = pkgs.buildEnv {
     name = "kubernetes-manifests";
@@ -629,6 +633,12 @@ in {
             }]
           '';
         };
+
+        configDir = mkOption {
+          description = "Path to Kubernetes CNI configuration directory.";
+          type = types.nullOr types.path;
+          default = null;
+        };
       };
 
       manifests = mkOption {
@@ -969,6 +979,7 @@ in {
             ${optionalString (cfg.clusterCidr!=null)
               "--cluster-cidr=${cfg.clusterCidr}"} \
             --allocate-node-cidrs=true \
+            --service-cluster-ip-range=10.90.0.0/16 \
             ${optionalString (cfg.controllerManager.featureGates != [])
               "--feature-gates=${concatMapStringsSep "," (feature: "${feature}=true") cfg.controllerManager.featureGates}"} \
             ${optionalString cfg.verbose "--v=6"} \
