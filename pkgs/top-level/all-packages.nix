@@ -19572,6 +19572,8 @@ with pkgs;
 
   cerebro = callPackage ../servers/search/cerebro {};
 
+  kube-router = callPackage ../dbc/applications/networking/kube-router {};
+
   # `recurseIntoAttrs` for sake of hydra, not nix-env
   tests = recurseIntoAttrs {
     cc-wrapper = callPackage ../test/cc-wrapper { };
