@@ -2,15 +2,20 @@ import ./make-test.nix ({ pkgs, ...} :
 
 with import ./kubernetes/base.nix { };
 let
-  domain = "my.domain";
-
   hostName = "machine";
+  domain = "my.domain";
+  fqdn = "${hostName}.${domain}";
+
   primaryIp = "127.0.0.1";
 
   serviceCidr = "10.90.0.0/16";
   podCidr = "10.100.0.0/16";
 
-  certs = import ./kubernetes/certs.nix { externalDomain = domain; serviceClusterIp = "10.90.0.1"; };
+  certs = import ./kubernetes/certs.nix {
+                                          externalDomain = domain;
+                                          serviceClusterIp = "10.90.0.1";
+                                          kubelets = [ fqdn ];
+                                        };
 
   mkKubeConfig = name: cfg: pkgs.writeText "${name}-kubeconfig" (builtins.toJSON {
     apiVersion = "v1";
@@ -60,7 +65,7 @@ let
            { from = 443; to = 443; } # kubernetes.apiserver
       ];
 
-      extraHosts = pkgs.lib.concatStringsSep "\n" ["127.0.0.1 ${hostName}.${domain}" "192.168.1.1 api.${domain}"];
+      extraHosts = pkgs.lib.concatStringsSep "\n" ["127.0.0.1 ${fqdn}" "192.168.1.1 api.${domain}"];
     };
 
    virtualisation.docker.enable = true;
@@ -87,7 +92,7 @@ let
 
       kube-router = {
         enable = true;
-        hostName = "${hostName}.${domain}";
+        hostName = fqdn;
         kubeConfig = routerKubeConfig;
         cniConfig = cniConf;
         mutableCniPath = "/var/lib/kube-router";
@@ -127,10 +132,10 @@ let
          kubelet = with pkgs; {
            tlsCertFile = "${certs.worker}/kubelet.pem";
            tlsKeyFile = "${certs.worker}/kubelet-key.pem";
-           hostname = "${hostName}.${domain}";
+           hostname = fqdn;
            kubeconfig = {
-             certFile = "${certs.worker}/apiserver-client-kubelet.pem";
-             keyFile = "${certs.worker}/apiserver-client-kubelet-key.pem";
+             certFile = "${certs.worker}/apiserver-client-kubelet-${fqdn}.pem";
+             keyFile = "${certs.worker}/apiserver-client-kubelet-${fqdn}-key.pem";
            };
 
            networkPlugin = "cni";
@@ -183,7 +188,7 @@ let
  };
 
  nginxManifest = pkgs.writeText "nginx-manifest.json" (builtins.toJSON {
-                   apiVersion = "extensions/v1beta1";
+                   apiVersion = "apps/v1";
                    kind = "Deployment";
                    metadata = {
                      name = "nginx-deployment";
@@ -222,7 +227,7 @@ in
   # TODO: Test of service networking
 
   testScript = ''
-    $machine->waitUntilSucceeds("kubectl get node ${hostName}.${domain} | grep -w Ready");
+    $machine->waitUntilSucceeds("kubectl get node ${fqdn} | grep -w Ready");
     $machine->succeed("kubectl apply -f ${nginxManifest}");
     $machine->waitUntilSucceeds("test \$(kubectl get pods | grep -c Running) == 2");
   '';
