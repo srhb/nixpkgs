@@ -5,7 +5,7 @@ mkDerivation rec {
   pname = "nixdeploy";
   version = "pre27_d06f363";
   src = fetchurl {
-    url = "https://hydra-platform.dbc.dk/build/157057/download/1/nixdeploy-${version}.tar.bz2";
+    url = "https://hydra-platform.dbc.dk/build/175859/download/1/nixdeploy-${version}.tar.bz2";
     sha256 = "0x5m08msd6v4yp21xj2z82jrb5smfabawnvmh5rc35gxcfwc8kqb";
   };
   isLibrary = false;
