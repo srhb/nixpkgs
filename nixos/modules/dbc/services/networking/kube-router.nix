@@ -11,10 +11,8 @@ let
 
   preStart = mkIf (cfg.cniConfig != null)
           ''
-            if [[ ! -f ${cfg.mutableCniPath}/${cniConfigFileName} ]]; then
               mkdir -p ${cfg.mutableCniPath}
               cp ${cniFile} ${cfg.mutableCniPath}/${cniConfigFileName}
-            fi
           '';
 
   start = ''
@@ -33,6 +31,9 @@ let
            --peer-router-ips=${concatMapStringsSep "," (router: router.ip) cfg.peerRouters} \
            --peer-router-passwords=${concatMapStringsSep "," (router: router.password) cfg.peerRouters} \
          '';
+
+  postStop = "rm -fr ${cfg.mutableCniPath}";
+
 in
 {
   options = {
@@ -173,6 +174,7 @@ in
       after = ["kubernetes.target"];
       requires = ["kubernetes.target"];
       inherit preStart;
+      inherit postStop;
       script = start;
       serviceConfig = {
         Type = "simple";
