@@ -31,7 +31,7 @@ let
            --peer-router-ips=${concatMapStringsSep "," (router: router.ip) cfg.peerRouters} \
            --peer-router-passwords=${concatMapStringsSep "," (router: router.password) cfg.peerRouters} \
            --cluster-asn=${toString cfg.clusterASN} \
-           --nodes-full-mesh=${toString cfg.nodesFullMesh}
+           --nodes-full-mesh=${boolToString cfg.nodesFullMesh}
          '';
 
   postStop = "rm -fr ${cfg.mutableCniPath}";
