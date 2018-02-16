@@ -30,6 +30,8 @@ let
            --peer-router-asns=${concatMapStringsSep "," (router: toString router.asn) cfg.peerRouters} \
            --peer-router-ips=${concatMapStringsSep "," (router: router.ip) cfg.peerRouters} \
            --peer-router-passwords=${concatMapStringsSep "," (router: router.password) cfg.peerRouters} \
+           --cluster-asn=${toString cfg.clusterASN} \
+           --nodes-full-mesh=${toString cfg.nodesFullMesh}
          '';
 
   postStop = "rm -fr ${cfg.mutableCniPath}";
@@ -157,6 +159,18 @@ in
         type = types.path;
         default = "/var/lib/kube-router";
         description = "Path for mutable cni config file.";
+      };
+
+      clusterASN = mkOption {
+        type = types.int;
+        default = 64512;
+        description = "ASN number under which cluster nodes will run iBGP.";
+      };
+
+      nodesFullMesh = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Whether each node in the cluster will setup BGP peering with rest of the nodes.";
       };
     };
   };
