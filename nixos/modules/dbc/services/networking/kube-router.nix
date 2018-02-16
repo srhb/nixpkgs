@@ -26,7 +26,7 @@ let
            --advertise-external-ip=${boolToString cfg.advertiseServiceExternalIP} \
            --enable-overlay=${boolToString cfg.enablePodOverlayNetwork} \
            --hairpin-mode=${boolToString cfg.enableHairpinMode} \
-           --enable-pod-egress=${boolToString cfg.enablePodSNAT}
+           --enable-pod-egress=${boolToString cfg.enablePodSNAT} \
            --peer-router-asns=${concatMapStringsSep "," (router: toString router.asn) cfg.peerRouters} \
            --peer-router-ips=${concatMapStringsSep "," (router: router.ip) cfg.peerRouters} \
            --peer-router-passwords=${concatMapStringsSep "," (router: router.password) cfg.peerRouters} \
