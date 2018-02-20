@@ -61,15 +61,18 @@ in {
       '';
 
       serviceConfig = {
+        User = "cfssl";
         WorkingDirectory = cfg.dataDir;
         Restart = "always";
 
-        ExecStart = concatStringsSep " \\\n" [
-          "${pkgs.cfssl}/bin/cfssl serve"
-          "-address=${cfg.address}"
-          "-port=${toString cfg.port}"
-          "-ca=${cfg.caFile}"
-          "-ca-key=${cfg.caKeyFile}"
+        ExecStart = with cfg; let notConfigurable = ""; in concatStringsSep " \\\n" [
+          ''${pkgs.cfssl}/bin/cfssl serve''
+          ''-address="${address}"''
+          ''-port="${toString port}"''
+          ''-ca="${caFile}"''
+          ''-ca-key="${caKeyFile}"''
+          ''-config=""'' # FIXME 
+          ''-db-config=""'' # FIXME
         ];
       };
     };

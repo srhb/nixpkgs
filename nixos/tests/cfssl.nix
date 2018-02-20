@@ -3,57 +3,65 @@ import ./make-test.nix ({ pkgs, ...} : {
 
   machine = { config, lib, pkgs, ... }:
   {
-    networking.firewall.allowedTCPPorts = [ 8080 8888 ];
+    networking.firewall.allowedTCPPorts = [ config.services.cfssl.port ];
+
     services.cfssl.enable = true;
-    services.nginx.enable = true;
-    services.certmgr = {
-      enable = true;
-      specs.nginx = {
-        action = "restart";
-        authority = {
-          #auth_key = "012345678012345678";
-          file = {
-          group = "nobody";
-          owner = "nobody";
-          path = "/tmp/ca.pem";
-          };
-          label = "www_ca";
-          profile = "three-month";
-          remote = "localhost:8888";
-        };
-        certificate = {
-          group = "nobody";
-          owner = "nobody";
-          path = "/tmp/test1.pem";
-        };
-        private_key = {
-          group = "nobody";
-          mode = "0600";
-          owner = "nobody";
-          path = "/tmp/www.key";
-        };
-        request = {
-          CN = "www.example.net";
-          hosts = [ "example.net" "www.example.net" ];
-          key = {
-            algo = "ecdsa";
-            size = 521;
-          };
-          names = [
-            {
-              C = "US";
-              L = "San Francisco";
-              O = "Example, LLC";
-              ST = "CA";
-            }
-          ];
-        };
-        service = "nginx";
+    systemd.services.cfssl.after = [ "cfssl-init.service" ];
+
+    systemd.services.cfssl-init = {
+      description = "Initialize the cfssl CA";
+      wantedBy    = [ "multi-user.target" ];
+      serviceConfig = {
+        User             = "cfssl";
+        Type             = "oneshot";
+        WorkingDirectory = config.services.cfssl.dataDir;
       };
+      script = with pkgs; ''
+        ${cfssl}/bin/cfssl genkey -initca ${pkgs.writeText "ca.json" (builtins.toJSON {
+          hosts = [ "ca.example.com" ];
+          key = {
+            algo = "rsa"; size = 4096; };
+            names = [
+              {
+                C = "US";
+                L = "San Francisco";
+                O = "Internet Widgets, LLC";
+                OU = "Certificate Authority";
+                ST = "California";
+              }
+            ];
+        })} | ${cfssl}/bin/cfssljson -bare ca
+      '';
     };
   };
 
-  testScript = ''
-    $machine->waitForUnit('cfssl');
-  '';
+  testScript =
+  let
+    cfsslrequest = with pkgs; writeScript "cfsslrequest" ''
+      curl -X POST -H "Content-Type: application/json" -d @${csr} \
+        http://localhost:8888/api/v1/cfssl/newkey | ${cfssl}/bin/cfssljson /tmp/certificate
+    '';
+    csr = pkgs.writeText "csr.json" (builtins.toJSON {
+      CN = "www.example.com";
+      hosts = [ "example.com" "www.example.com" ];
+      key = {
+        algo = "rsa";
+        size = 2048;
+      };
+      names = [
+        {
+          C = "US";
+          L = "San Francisco";
+          O = "Example Company, LLC";
+          OU = "Operations";
+          ST = "California";
+        }
+      ];
+    });
+  in
+    ''
+      $machine->waitForUnit('cfssl.service');
+      $machine->waitUntilSucceeds('${cfsslrequest}');
+      $machine->succeed('ls /tmp/certificate-key.pem');
+    '';
 })

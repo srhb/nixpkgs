@@ -24,7 +24,7 @@ in
 
     defaultRemote = mkOption {
       type = types.str;
-      default = "127.0.0.1";
+      default = "127.0.0.1:8888";
       description = "The default CA host:port to use";
     };
 
