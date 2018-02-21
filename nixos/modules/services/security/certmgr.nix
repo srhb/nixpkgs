@@ -4,13 +4,14 @@ with lib;
 
 let
   cfg = config.services.certmgr;
-  specDir = pkgs.buildEnv {
+  allSpecs = pkgs.buildEnv {
     name = "certmgr.d";
-    paths = mapAttrsToList (name: value: pkgs.writeTextDir (name + ".json") (builtins.toJSON value)) cfg.specs;
+    paths = mapAttrsToList (name: value: pkgs.writeTextDir (name + ".json") (builtins.toJSON value)) cfg.declSpecs
+         ++ optional (cfg.impSpecs != []) (pkgs.linkFarm "impSpecs" cfg.impSpecs);
   };
 
   certmgrYaml = pkgs.writeText "certmgr.yaml" (builtins.toJSON {
-    dir = specDir;
+    dir = allSpecs;
     default_remote = cfg.defaultRemote;
     svcmgr = "systemd";
     inherit (cfg) before interval metricsPort metricsAddress;
@@ -50,12 +51,23 @@ in
       description = "The port for the Prometheus HTTP endpoint";
     };
 
-    specs = mkOption {
+    impSpecs = mkOption {
       default = [];
-      type = with types; attrsOf attrs;
+      # FIXME: Nonstorepath, must not go into store if they contain secrets
+      type = with types; listOf (submodule {
+        options.name = mkOption { type = str; description = "name of the symlink";   };
+        options.path = mkOption { type = str; description = "target of the symlink"; };
+      });
+      description = "List of { name, path } to link into the specsdir imperatively.";
+    };
+
+    declSpecs = mkOption {
+      default = null;
+      type = with types; nullOr (attrsOf attrs); # FIXME submodule before pushing! attrsOf attrs merge in confusing ways!
       description = ''
         Certificate specs as described by:
         https://github.com/cloudflare/certmgr#certificate-specs
+        These will be added to the Nix store, so they will be world readable.
       '';
     };
   };
