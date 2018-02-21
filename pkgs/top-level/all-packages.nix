@@ -1525,6 +1525,8 @@ with pkgs;
 
   certstrap = callPackage ../tools/security/certstrap { };
 
+  certmgr = callPackage ../servers/certmgr { };
+
   cfssl = callPackage ../tools/security/cfssl { };
 
   checkbashisms = callPackage ../development/tools/misc/checkbashisms { };

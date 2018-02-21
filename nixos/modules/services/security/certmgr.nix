@@ -18,9 +18,7 @@ let
 in
 {
   options.services.certmgr = {
-    enable = mkEnableOption ''
-        Whether to enable certmgr
-    '';
+    enable = mkEnableOption "Whether to enable certmgr";
 
     defaultRemote = mkOption {
       type = types.str;
