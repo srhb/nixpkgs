@@ -1,6 +1,6 @@
 { lib, buildGoPackage, fetchFromGitHub }:
 
-let version = "2.4.1"; in
+let version = "2.9.0"; in
 
 buildGoPackage rec {
   name = "dex-${version}";
@@ -11,7 +11,7 @@ buildGoPackage rec {
     rev = "v${version}";
     owner = "coreos";
     repo = "dex";
-    sha256 = "11qpn3wh74mq16xgl9l50n2v02ffqcd14xccf77j5il04xr764nx";
+    sha256 = "03ss75aaz557ia10alyidpsv6dz35ssrhzz3jf6chb6hkd1hb77b";
   };
 
   subPackages = [
