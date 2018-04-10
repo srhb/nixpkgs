@@ -147,9 +147,12 @@ in {
     incompatibleKernelVersion = null;
 
     # this package should point to the latest release.
-    version = "0.7.7";
 
-    sha256 = "0lrzy27sh1cinkf04ki2vfjrgpgbiza2s59i2by45qdd8kmkcc5r";
+    # Do not upgrade to 0.7.7. Go directly to 0.7.8.
+    # https://github.com/zfsonlinux/zfs/issues/7401
+    version = "0.7.6";
+
+    sha256 = "1k3a69zfdk4ia4z2l69lbz0mj26bwdanxd2wynkdpm2kl3zjj18h";
 
     extraPatches = [
       (fetchpatch {
