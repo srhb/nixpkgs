@@ -112,7 +112,7 @@ stdenv.mkDerivation rec {
       };
     };
   in
-  fetchurl {
+  if !lib.hasAttr stdenv.system arches then null else fetchurl {
     inherit (arches.${stdenv.system}) url sha256;
   };
 
