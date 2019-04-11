@@ -13,13 +13,13 @@ let libPath = lib.makeLibraryPath [
 ];
 in stdenv.mkDerivation rec {
   pname = "airtame";
-  version = "3.3.0";
+  version = "3.3.2";
   name = "${pname}-${version}";
   longName = "${pname}-application";
 
   src = fetchurl {
     url = "https://downloads.airtame.com/application/ga/lin_x64/releases/${longName}-${version}.tar.gz";
-    sha256 = "16ca1vcxpka26jcrfbxpq74kcizgrm138j94bby6kzqp2swhrl76";
+    sha256 = "02b7lqh3rcc8mgim7ldx48haw2c9sxllx9364cs6l5gxsj9257y8";
   };
 
   nativeBuildInputs = [ makeWrapper ];
