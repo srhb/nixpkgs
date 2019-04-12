@@ -13687,6 +13687,8 @@ in
 
   _389-ds-base = callPackage ../servers/ldap/389 {
     kerberos = libkrb5;
+    sasl = cyrus_sasl;
+    icu = icu63;
   };
 
   rdf4store = callPackage ../servers/http/4store { };

@@ -1,59 +1,71 @@
-{ stdenv, fetchurl, pkgconfig, perl, pam, nspr, nss, openldap
-, db, cyrus_sasl, svrcore, icu, net_snmp, kerberos, pcre, perlPackages
+{ stdenv
+, fetchurl
+
+, autoreconfHook
+, pkgconfig
+, rsync
+
+, cracklib
+, kerberos
+, pam
+, libevent
+, nspr
+, nss
+, openldap
+, db
+, sasl
+, icu
+, net_snmp
+, pcre
+, perl
+, openssl
 }:
 let
-  version = "1.3.5.19";
+  version = "1.4.1.2";
 in
 stdenv.mkDerivation rec {
   name = "389-ds-base-${version}";
 
   src = fetchurl {
-    url = "http://directory.fedoraproject.org/binaries/${name}.tar.bz2";
-    sha256 = "1r1n44xfvy51r4r1180dfmjziyj3pqxwmnv6rjvvvjjm87fslmdd";
+    url = "https://releases.pagure.org/389-ds-base/389-ds-base-${version}.tar.bz2";
+    sha256 = "13gdsjbrn94n8raf3amn9z5afa02r5y8g93c51b7h21g4zfg2xj1";
   };
 
-  nativeBuildInputs = [ pkgconfig ];
+  nativeBuildInputs = [ autoreconfHook pkgconfig ];
+
   buildInputs = [
-    perl pam nspr nss openldap db cyrus_sasl svrcore icu
-    net_snmp kerberos pcre
-  ] ++ (with perlPackages; [ MozillaLdap NetAddrIP DBFile ]);
-
-  # TODO: Fix bin/ds-logpipe.py, bin/logconv, bin/cl-dump
-
-  patches = [ ./perl-path.patch
+    cracklib
+    pam
+    libevent
+    nspr
+    nss
+    openldap
+    sasl
+    icu
+    kerberos
+    pcre
+    perl
+    openssl
+    rsync
   ];
 
+  postPatch = ''
+    substituteInPlace include/ldaputil/certmap.h \
+      --replace "nss3/cert.h" "nss/cert.h"
+  '';
+
   preConfigure = ''
-    # Create perl paths for library imports in perl scripts
-    PERLPATH=""
-    for P in $(echo $PERL5LIB | sed 's/:/ /g'); do
-      PERLPATH="$PERLPATH $(echo $P/*/*)"
-    done
-    export PERLPATH
+    # Fix for missing <sasl.h> during build
+    export CFLAGS"=-I${sasl.dev}/include/sasl"
   '';
 
   configureFlags = [
-    "--sysconfdir=/etc"
-    "--localstatedir=/var"
     "--with-openldap"
     "--with-db"
     "--with-db-inc=${db.dev}/include"
     "--with-db-lib=${db.out}/lib"
-    "--with-sasl=${cyrus_sasl.dev}"
     "--with-netsnmp=${net_snmp}"
   ];
-
-  preInstall = ''
-    # The makefile doesn't create this directory for whatever reason
-    mkdir -p $out/lib/dirsrv
-  '';
-
-  installFlags = [
-    "sysconfdir=\${out}/etc"
-    "localstatedir=\${TMPDIR}"
-  ];
-
-  passthru.version = version;
 
   meta = with stdenv.lib; {
     homepage = http://www.port389.org/;
