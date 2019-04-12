@@ -17,6 +17,12 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ autoreconfHook pkgconfig ];
 
+  # FIXME: Why is the original order problematic? freeipa chokes on it
+  postPatch = ''
+    sed -i '/exec_prefix/d' *.in
+    sed -i '2iexec_prefix=@exec_prefix@' *.in
+  '';
+
   meta = with stdenv.lib; {
     homepage = https://github.com/latchset/libverto;
     description = "An async event loop abstraction library";

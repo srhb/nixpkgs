@@ -14676,6 +14676,11 @@ in
 
   dstat = callPackage ../os-specific/linux/dstat { };
 
+  freeipa = callPackage ../os-specific/linux/freeipa {
+    sasl = cyrus_sasl;
+    samba = samba.override { enableLDAP = true; };
+  };
+
   # unstable until the first 1.x release
   fscrypt-experimental = callPackage ../os-specific/linux/fscrypt {
     buildGoPackage = buildGo110Package;
