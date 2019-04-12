@@ -11702,6 +11702,8 @@ in
 
   libversion = callPackage ../development/libraries/libversion { };
 
+  libverto = callPackage ../development/libraries/libverto { };
+
   libvirt = callPackage ../development/libraries/libvirt { };
 
   libvirt-glib = callPackage ../development/libraries/libvirt-glib { };
