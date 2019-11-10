@@ -171,7 +171,7 @@ in rec {
       description = "Distributed storage system";
       license = with licenses; [ lgpl21 gpl2 bsd3 mit publicDomain ];
       maintainers = with maintainers; [ adev ak krav johanot ];
-      platforms = platforms.unix;
+      platforms = [ "x86_64-linux" ];
     };
 
     passthru.version = version;
@@ -183,7 +183,7 @@ in rec {
         description = "Tools needed to mount Ceph's RADOS Block Devices";
         license = with licenses; [ lgpl21 gpl2 bsd3 mit publicDomain ];
         maintainers = with maintainers; [ adev ak johanot krav ];
-        platforms = platforms.unix;
+        platforms = [ "x86_64-linux" ];
       };
     } ''
       mkdir -p $out/{bin,etc,lib/python3.7/site-packages}
