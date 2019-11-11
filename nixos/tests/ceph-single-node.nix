@@ -154,6 +154,14 @@ let
     );
     $monA->waitUntilSucceeds("ceph -s | grep 'HEALTH_OK'");
     $monA->waitUntilSucceeds("ceph -s | grep '100 active+clean'");
+
+    # Check that we can start the dashboard and create an admin user
+    $monA->mustSucceed("ceph mgr module enable dashboard");
+    $monA->mustSucceed("ceph dashboard create-self-signed-cert");
+    $monA->waitUntilSucceeds("ceph mgr services | grep 8443");
+    $monA->mustSucceed("curl --fail --insecure https://monA:8443");
+    $monA->mustSucceed("ceph dashboard ac-user-create admin adminPass administrator");
+
     $monA->mustFail(
       "ceph osd pool ls | grep 'multi-node-test'",
       "ceph osd pool delete single-node-other-test single-node-other-test --yes-i-really-really-mean-it"
