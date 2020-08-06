@@ -26,13 +26,13 @@ let
   };
 in stdenv.mkDerivation rec {
   pname = "w3m";
-  version = "0.5.3+git20190105";
+  version = "0.5.3+git20200502";
 
   src = fetchFromGitHub {
     owner = "tats";
     repo = pname;
     rev = "v${version}";
-    sha256 = "1fbg2p8qh2gvi3g4iz4q6vc0k70pf248r4yndi5lcn2m3mzvjx0i";
+    sha256 = "0yyfhwcwy1dvdbirj6zqwk4gl8z9npfavs0k7ipcg5fd16vnx7mi";
   };
 
   NIX_LDFLAGS = optionalString stdenv.isSunOS "-lsocket -lnsl";
