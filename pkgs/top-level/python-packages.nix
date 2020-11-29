@@ -1068,6 +1068,8 @@ in {
 
   canopen = callPackage ../development/python-modules/canopen { };
 
+  cantera = toPythonModule (pkgs.cantera.override { pythonSupport = "full"; });
+
   capstone = callPackage ../development/python-modules/capstone { inherit (pkgs) capstone; };
 
   capturer = callPackage ../development/python-modules/capturer { };

@@ -26485,6 +26485,8 @@ in
 
   brial = callPackage ../development/libraries/science/math/brial { };
 
+  cantera = callPackage ../development/libraries/science/math/cantera {};
+
   clblas = callPackage ../development/libraries/science/math/clblas {
     inherit (darwin.apple_sdk.frameworks) Accelerate CoreGraphics CoreVideo OpenCL;
   };
