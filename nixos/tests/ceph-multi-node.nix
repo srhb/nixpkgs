@@ -212,7 +212,7 @@ let
         #"ceph-mds --cluster ceph -i ${cfg.monA.name} -m ${cfg.monA.ip}:6789",
         "systemctl start ceph-mds.target",
     )
-    monA.wait_for_unit("ceph-mds@${cfg.monA.name}.service")
+    monA.wait_for_unit("ceph-mds-${cfg.monA.name}.service")
     monA.wait_until_succeeds("ceph mds stat | grep 'up:standby'")
 
     # Create a Ceph filesystem according to https://docs.ceph.com/en/latest/cephfs/createfs/
