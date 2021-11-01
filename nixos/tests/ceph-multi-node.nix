@@ -1,8 +1,9 @@
-import ./make-test-python.nix ({pkgs, lib, ...}:
+import ./make-test-python.nix ({ lib, ... }:
 
 let
+  clusterId = "066ae264-2a5d-4729-8001-6ad265f50b03";
+
   cfg = {
-    clusterId = "066ae264-2a5d-4729-8001-6ad265f50b03";
     monA = {
       name = "a";
       ip = "192.168.1.1";
@@ -26,78 +27,80 @@ let
       uuid = "ea999274-13d0-4dd5-9af9-ad25a324f72f";
     };
   };
-  generateCephConfig = { daemonConfig }: {
-    enable = true;
-    global = {
-      fsid = cfg.clusterId;
-      monHost = cfg.monA.ip;
-      monInitialMembers = cfg.monA.name;
-    };
-  } // daemonConfig;
 
-  generateHost = { pkgs, cephConfig, networkConfig, ... }: {
+  host = { pkgs, ... }: {
     virtualisation = {
       memorySize = 1024;
       emptyDiskImages = [ 20480 ];
       vlans = [ 1 ];
     };
 
-    networking = networkConfig;
+    boot.kernelModules = [ "xfs" ];
 
     environment.systemPackages = with pkgs; [
       bash
       sudo
       ceph
       xfsprogs
-      netcat-openbsd
     ];
 
-    boot.kernelModules = [ "xfs" ];
-
-    services.ceph = cephConfig;
-  };
-
-  networkMonA = {
-    dhcpcd.enable = false;
-    interfaces.eth1.ipv4.addresses = pkgs.lib.mkOverride 0 [
-      { address = cfg.monA.ip; prefixLength = 24; }
-    ];
-    firewall = {
-      allowedTCPPorts = [ 6789 3300 ];
-      allowedTCPPortRanges = [ { from = 6800; to = 7300; } ];
-    };
-  };
-  cephConfigMonA = generateCephConfig { daemonConfig = {
-    mds = {
+    services.ceph = {
       enable = true;
-      daemons = [ cfg.monA.name ];
-    };
-    mon = {
-      enable = true;
-      daemons = [ cfg.monA.name ];
-    };
-    mgr = {
-      enable = true;
-      daemons = [ cfg.monA.name ];
-    };
-  }; };
-
-  networkOsd = osd: {
-    dhcpcd.enable = false;
-    interfaces.eth1.ipv4.addresses = pkgs.lib.mkOverride 0 [
-      { address = osd.ip; prefixLength = 24; }
-    ];
-    firewall = {
-      allowedTCPPortRanges = [ { from = 6800; to = 7300; } ];
+      global = {
+        fsid = clusterId;
+        monHost = cfg.monA.ip;
+        monInitialMembers = cfg.monA.name;
+      };
     };
   };
 
-  cephConfigOsd = osd: generateCephConfig { daemonConfig = {
-    osd = {
-      enable = true;
-      daemons = [ osd.name ];
+  mon = cfg: { lib, ... }: {
+    imports = [ host ];
+
+    networking = {
+      interfaces.eth1.ipv4.addresses = lib.mkOverride 0 [
+        { address = cfg.ip; prefixLength = 24; }
+      ];
+
+      firewall = {
+        allowedTCPPorts = [ 6789 3300 ];
+        allowedTCPPortRanges = [ { from = 6800; to = 7300; } ];
+      };
     };
-  }; };
+
+    services.ceph = {
+      mds = {
+        enable = true;
+        daemons = [ cfg.name ];
+      };
+      mon = {
+        enable = true;
+        daemons = [ cfg.name ];
+      };
+      mgr = {
+        enable = true;
+        daemons = [ cfg.name ];
+      };
+    };
+  };
+
+  osd = cfg: { lib, ... }: {
+    imports = [ host ];
+
+    networking = {
+      interfaces.eth1.ipv4.addresses = lib.mkOverride 0 [
+        { address = cfg.ip; prefixLength = 24; }
+      ];
+      firewall = {
+        allowedTCPPortRanges = [ { from = 6800; to = 7300; } ];
+      };
+    };
+
+    services.ceph.osd = {
+      enable = true;
+      daemons = [ cfg.name ];
+    };
+  };
 
   # Following deployment is based on the manual deployment described here:
   # https://docs.ceph.com/docs/master/install/manual-deployment/
@@ -116,7 +119,7 @@ let
         "sudo -u ceph ceph-authtool --create-keyring /tmp/ceph.mon.keyring --gen-key -n mon. --cap mon 'allow *'",
         "sudo -u ceph ceph-authtool --create-keyring /etc/ceph/ceph.client.admin.keyring --gen-key -n client.admin --cap mon 'allow *' --cap osd 'allow *' --cap mds 'allow *' --cap mgr 'allow *'",
         "sudo -u ceph ceph-authtool /tmp/ceph.mon.keyring --import-keyring /etc/ceph/ceph.client.admin.keyring",
-        "monmaptool --create --add ${cfg.monA.name} ${cfg.monA.ip} --fsid ${cfg.clusterId} /tmp/monmap",
+        "monmaptool --create --add ${cfg.monA.name} ${cfg.monA.ip} --fsid ${clusterId} /tmp/monmap",
         "sudo -u ceph ceph-mon --mkfs -i ${cfg.monA.name} --monmap /tmp/monmap --keyring /tmp/ceph.mon.keyring",
         "sudo -u ceph mkdir -p /var/lib/ceph/mgr/ceph-${cfg.monA.name}/",
         "sudo -u ceph touch /var/lib/ceph/mon/ceph-${cfg.monA.name}/done",
@@ -250,15 +253,15 @@ let
   '';
 in {
   name = "basic-multi-node-ceph-cluster";
-  meta = with pkgs.lib.maintainers; {
+  meta = with lib.maintainers; {
     maintainers = [ lejonet ];
   };
 
   nodes = {
-    monA = generateHost { pkgs = pkgs; cephConfig = cephConfigMonA; networkConfig = networkMonA; };
-    osd0 = generateHost { pkgs = pkgs; cephConfig = cephConfigOsd cfg.osd0; networkConfig = networkOsd cfg.osd0; };
-    osd1 = generateHost { pkgs = pkgs; cephConfig = cephConfigOsd cfg.osd1; networkConfig = networkOsd cfg.osd1; };
-    osd2 = generateHost { pkgs = pkgs; cephConfig = cephConfigOsd cfg.osd2; networkConfig = networkOsd cfg.osd2; };
+    monA = mon cfg.monA;
+    osd0 = osd cfg.osd0;
+    osd1 = osd cfg.osd1;
+    osd2 = osd cfg.osd2;
   };
 
   testScript = testscript;
