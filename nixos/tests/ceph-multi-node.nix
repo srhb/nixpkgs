@@ -57,6 +57,8 @@ let
   mon = cfg: { lib, ... }: {
     imports = [ host ];
 
+    boot.kernelModules = [ "ceph" ];
+
     networking = {
       interfaces.eth1.ipv4.addresses = lib.mkOverride 0 [
         { address = cfg.ip; prefixLength = 24; }
@@ -100,6 +102,13 @@ let
       enable = true;
       daemons = [ cfg.name ];
     };
+
+    systemd.mounts = [
+      {
+        what = "/dev/vdb";
+        where = "/var/lib/ceph/osd/ceph-${cfg.name}";
+      }
+    ];
   };
 
   # Following deployment is based on the manual deployment described here:
@@ -210,9 +219,7 @@ let
         "mkdir -p /var/lib/ceph/mds/ceph-${cfg.monA.name}",
         "ceph auth get-or-create mds.${cfg.monA.name} mon 'profile mds' mgr 'profile mds' mds 'allow *' osd 'allow *' > /var/lib/ceph/mds/ceph-${cfg.monA.name}/keyring",
         "chown -R ceph:ceph /var/lib/ceph/mds",
-        # Run ceph-mds once to connect it to a mon, otherwise it errors out. Are we missing [mon.N] sections in ceph.conf?
-        #   ceph-mds[881]: failed to fetch mon config (--no-mon-config to skip)
-        #"ceph-mds --cluster ceph -i ${cfg.monA.name} -m ${cfg.monA.ip}:6789",
+        "sync", # or we might lose the keyring on crash
         "systemctl start ceph-mds.target",
     )
     monA.wait_for_unit("ceph-mds-${cfg.monA.name}.service")
@@ -228,7 +235,13 @@ let
     monA.wait_until_succeeds("ceph -s | grep 'mds: 1/1'")
     monA.wait_until_succeeds("ceph -s | grep 'HEALTH_OK'")
 
-    # TODO: Mount CephFS, write test data
+    # Mount CephFS, write test data
+    monA.succeed(
+        "mkdir /run/cephfs",
+        "mount.ceph ${cfg.monA.ip}:/ /run/cephfs -o name=admin",
+        "echo teststring > /run/cephfs/testfile",
+        "sync", # or we might lose the teststring on crash
+    )
 
     # Shut down ceph on all machines in a very unpolite way
     monA.crash()
@@ -236,20 +249,32 @@ let
     osd1.crash()
     osd2.crash()
 
-    # Start it up
+    # Start everything but osd2
+    monA.start()
     osd0.start()
     osd1.start()
-    osd2.start()
-    monA.start()
 
     # Ensure the cluster comes back up again
+    # We're leaving the last osd for a bit because we want to be sure we don't
+    # act on stale cluster state from before the restart. Check that one osd is
+    # down, then bring it up and re-check full cluster
+    monA.wait_until_succeeds("ceph osd stat | grep -e '3 osds: 2 up[^,]*, 3 in'")
+    osd2.start()
+
     monA.succeed("ceph -s | grep 'mon: 1 daemons'")
     monA.wait_until_succeeds("ceph -s | grep 'quorum ${cfg.monA.name}'")
     monA.wait_until_succeeds("ceph osd stat | grep -e '3 osds: 3 up[^,]*, 3 in'")
     monA.wait_until_succeeds("ceph -s | grep 'mgr: ${cfg.monA.name}(active,'")
+    monA.wait_until_succeeds("ceph mds stat | grep 'up:active'")
+    monA.wait_until_succeeds("ceph fs status | grep 'active'")
     monA.wait_until_succeeds("ceph -s | grep 'HEALTH_OK'")
 
-    # TODO: Mount CephFS, check test data is healthy
+    # Mount CephFS, check test data is healthy
+    monA.succeed(
+        "mkdir /run/cephfs",
+        "mount.ceph ${cfg.monA.ip}:/ /run/cephfs -o name=admin",
+        "grep -q teststring /run/cephfs/testfile",
+    )
   '';
 in {
   name = "basic-multi-node-ceph-cluster";
