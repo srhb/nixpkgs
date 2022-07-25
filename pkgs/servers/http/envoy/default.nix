@@ -23,7 +23,7 @@ let
     # However, the version string is more useful for end-users.
     # These are contained in a attrset of their own to make it obvious that
     # people should update both.
-    version = "1.21.4";
+    version = "1.23.0";
     rev = "782ba5e5ab9476770378ec9f1901803e0d38ac41";
   };
 in
@@ -56,12 +56,6 @@ buildBazelPackage rec {
   '';
 
   patches = [
-    # make linux/tcp.h relative. drop when upgrading to >1.21
-    (fetchpatch {
-      url = "https://github.com/envoyproxy/envoy/commit/68448aae7a78a3123097b6ea96016b270457e7b8.patch";
-      sha256 = "123kv3x37p8fgfp29jhw5xg5js5q5ipibs8hsm7gzfd5bcllnpfh";
-    })
-
     # fix issues with brotli and GCC 11.2.0+ (-Werror=vla-parameter)
     ./bump-brotli.patch
 
@@ -85,8 +79,8 @@ buildBazelPackage rec {
 
   fetchAttrs = {
     sha256 = {
-      x86_64-linux = "sha256-/SA+WFHcMjk6iLwuEmuBIzy3pMhw7TThIEx292dv6IE=";
-      aarch64-linux = "sha256-0XdeirdIP7+nKy8zZbr2uHN2RZ4ZFOJt9i/+Ow1s/W4=";
+      x86_64-linux = "sha256-cxmz/OArMAn60/zed5h3vY05zGO3wPvljf9FRSqn6gE=";
+      aarch64-linux = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
     }.${stdenv.system} or (throw "unsupported system ${stdenv.system}");
     dontUseCmakeConfigure = true;
     dontUseGnConfigure = true;
