@@ -50,7 +50,7 @@ let
 
       kafka.wait_until_succeeds(
           "${kafkaPackage}/bin/kafka-topics.sh --create "
-          + "--zookeeper zookeeper1:2181 --partitions 1 "
+          + "--bootstrap-server localhost:9092 --partitions 1 "
           + "--replication-factor 1 --topic testtopic"
       )
       kafka.succeed(
@@ -61,7 +61,7 @@ let
     '' + (if name == "kafka_0_9" then ''
       assert "test 1" in kafka.succeed(
           "${kafkaPackage}/bin/kafka-console-consumer.sh "
-          + "--zookeeper zookeeper1:2181 --topic testtopic "
+          + "--bootstrap-server localhost:9092 --topic testtopic "
           + "--from-beginning --max-messages 1"
       )
     '' else ''
@@ -76,4 +76,5 @@ let
 in with pkgs; {
   kafka_2_7  = makeKafkaTest "kafka_2_7"  apacheKafka_2_7;
   kafka_2_8  = makeKafkaTest "kafka_2_8"  apacheKafka_2_8;
+  kafka_3_3  = makeKafkaTest "kafka_3_3"  apacheKafka_3_3;
 }
