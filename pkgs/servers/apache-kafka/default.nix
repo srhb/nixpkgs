@@ -5,12 +5,6 @@ let
   jre8 = jdk8_headless;
   jre11 = jdk11_headless;
   versionMap = {
-    "2.7" = {
-      kafkaVersion = "2.7.1";
-      scalaVersion = "2.13";
-      sha256 = "1qv6blf99211bc80xnd4k42r9v9c5vilyqkplyhsa6hqymg32gfa";
-      jre = jre11;
-    };
     "2.8" = {
       kafkaVersion = "2.8.1";
       scalaVersion = "2.13";

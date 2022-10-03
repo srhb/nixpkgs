@@ -15863,7 +15863,6 @@ with pkgs;
   ant = apacheAnt;
 
   apacheKafka = apacheKafka_3_3;
-  apacheKafka_2_7 = callPackage ../servers/apache-kafka { majorVersion = "2.7"; };
   apacheKafka_2_8 = callPackage ../servers/apache-kafka { majorVersion = "2.8"; };
   apacheKafka_3_3 = callPackage ../servers/apache-kafka { majorVersion = "3.3"; };
 
