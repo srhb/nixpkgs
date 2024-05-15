@@ -84,6 +84,7 @@ let
     "smokeping"
     "snmp"
     "sql"
+    "squid"
     "statsd"
     "surfboard"
     "systemd"

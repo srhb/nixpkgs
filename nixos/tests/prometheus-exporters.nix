@@ -1446,6 +1446,24 @@ let
       '';
     };
 
+    squid = {
+      exporterConfig = {
+        enable = true;
+      };
+      metricProvider = {
+        services.squid.enable = true;
+      };
+      exporterTest = ''
+        wait_for_unit("prometheus-squid-exporter.service")
+        wait_for_open_port(9301)
+        succeed("curl http://localhost:9301/metrics | grep 'squid_exporter_build_info{'")
+        wait_until_succeeds(
+          "curl http://localhost:9301/metrics | grep 'squid_up{.*} 1'",
+          timeout=10
+        )
+      '';
+    };
+
     statsd = {
       exporterConfig = {
         enable = true;
