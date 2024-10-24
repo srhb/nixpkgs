@@ -11,6 +11,7 @@ let
   gitaly_package = "gitlab.com/gitlab-org/gitaly/${package_version}";
 
   git = callPackage ./git.nix { };
+  gitMajorMinor = lib.versions.majorMinor git.version;
 
   commonOpts = {
     inherit version;
@@ -48,9 +49,10 @@ buildGoModule ({
     cp -r ${auxBins}/bin/* _build/bin
     # gitaly embeds these git binaries in its own binary
     # https://gitlab.com/gitlab-org/gitaly/-/blob/10fd91391a7c30ca54ec81eea881740cfdee8b0a/Makefile#L122
-    find ${git}/bin
-    for f in ${git}/bin/{git,git-remote-http,git-http-backend}; do
-      cp "$f" "_build/bin/gitaly-$(basename $f)";
+    for f in ${git}/bin/gitaly-{git,git-remote-http,git-http-backend}-v${gitMajorMinor}; do
+      dest=''${f/#"${git}/bin/gitaly-"/}
+      dest=''${dest/%"-v${gitMajorMinor}"/}
+      cp -a $f _build/bin/$dest
     done
   '';
 
