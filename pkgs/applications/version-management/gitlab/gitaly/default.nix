@@ -46,7 +46,10 @@ buildGoModule ({
   preConfigure = ''
     mkdir -p _build/bin
     cp -r ${auxBins}/bin/* _build/bin
-    for f in ${git}/bin/git-*; do
+    # gitaly embeds these git binaries in its own binary
+    # https://gitlab.com/gitlab-org/gitaly/-/blob/10fd91391a7c30ca54ec81eea881740cfdee8b0a/Makefile#L122
+    find ${git}/bin
+    for f in ${git}/bin/{git,git-remote-http,git-http-backend}; do
       cp "$f" "_build/bin/gitaly-$(basename $f)";
     done
   '';
